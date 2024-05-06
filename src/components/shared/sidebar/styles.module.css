@@ -1,6 +1,8 @@
 .navbar {
-    height: rem(700px);
+    /* height: rem(700px); */
+    /* min-height: rem(700px); */
     /* width: rem(300px); */
+    height: 100%;
     padding: var(--mantine-spacing-md);
     display: flex;
     flex-direction: column;
@@ -13,6 +15,7 @@
   }
   
   .header {
+    align-items: flex-end;
     padding-bottom: var(--mantine-spacing-md);
     margin-bottom: calc(var(--mantine-spacing-md) * 1.5);
     border-bottom: rem(1px) solid var(--mantine-color-blue-7);
@@ -36,7 +39,7 @@
     text-decoration: none;
     font-size: var(--mantine-font-size-sm);
     color: var(--mantine-color-white);
-    padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+    padding: var(--mantine-spacing-sm) var(--mantine-spacing-sm);
     border-radius: var(--mantine-radius-sm);
     font-weight: 500;
   

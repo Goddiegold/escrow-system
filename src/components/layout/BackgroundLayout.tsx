@@ -1,7 +1,8 @@
-import { Flex, Text, BackgroundImage, Paper, Container, Group } from '@mantine/core';
+import { Flex, Text, BackgroundImage, Paper, Container, Group, Center } from '@mantine/core';
 import { ReactNode } from 'react';
 import handshakePic from "@/assets/handshake.jpg"
 import { Link } from 'react-router-dom';
+import Logo from '../shared/Logo';
 
 interface BackgroundLayoutProps {
     title?: string,
@@ -31,9 +32,11 @@ function BackgroundLayout({ title, children, bottomContent }: BackgroundLayoutPr
                         p={30}
                         radius={"sm"}
                         className='w-[90%] sm:w-[350px]' mx={10}>
-                        <div className="flex items-center justify-center mb-[20px]">
-                            {/* <Image src={logo} width={200} /> */}
-                        </div>
+                        {/* <div className="flex items-center justify-center mb-[20px]">
+                        </div> */}
+                        <Center my={20}>
+                            <Logo />
+                        </Center>
                         <Text className="text-center" size="lg" fw={600}>{title}</Text>
                         {children}
                     </Paper>

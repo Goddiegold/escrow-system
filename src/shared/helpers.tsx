@@ -1,5 +1,6 @@
 import { notifications } from "@mantine/notifications";
 import { jwtDecode } from "jwt-decode";
+import { Gear, HouseLine, ShoppingCart, SquaresFour, User as UserIcon, Wallet } from '@phosphor-icons/react';
 
 
 export const toast = (message: string, title?: string) => {
@@ -82,4 +83,27 @@ export function getInitials(name: string) {
     return firstName[0] + firstName[1]
 }
 
+
+export const menuData = [
+    {
+      link: '',
+      label: 'Dashboard',
+      icon: SquaresFour
+    },
+    {
+      link: '',
+      label: 'Wallet',
+      icon: Wallet
+    },
+    {
+      link: '',
+      label: 'Orders',
+      icon: ShoppingCart
+    },
+    {
+      link: '',
+      label: 'Settings',
+      icon: Gear
+    },
+  ];
 

@@ -565,12 +565,24 @@ video {
   margin-bottom: auto;
 }
 
+.-mr-\[20px\]{
+  margin-right: -20px;
+}
+
 .mb-\[20px\]{
   margin-bottom: 20px;
 }
 
+.mr-\[10px\]{
+  margin-right: 10px;
+}
+
 .mt-2{
   margin-top: 0.5rem;
+}
+
+.block{
+  display: block;
 }
 
 .flex{
@@ -581,12 +593,20 @@ video {
   display: none;
 }
 
+.h-\[30px\]{
+  height: 30px;
+}
+
 .h-full{
   height: 100%;
 }
 
 .min-h-full{
   min-height: 100%;
+}
+
+.w-\[30px\]{
+  width: 30px;
 }
 
 .w-\[50\%\]{
@@ -601,6 +621,14 @@ video {
   width: 100%;
 }
 
+.max-w-\[70\%\]{
+  max-width: 70%;
+}
+
+.grow{
+  flex-grow: 1;
+}
+
 .resize{
   resize: both;
 }
@@ -613,6 +641,10 @@ video {
   flex-direction: column;
 }
 
+.items-start{
+  align-items: flex-start;
+}
+
 .items-center{
   align-items: center;
 }
@@ -621,17 +653,33 @@ video {
   justify-content: center;
 }
 
+.text-wrap{
+  text-wrap: wrap;
+}
+
+.\!break-all{
+  word-break: break-all !important;
+}
+
+.rounded-md{
+  border-radius: 0.375rem;
+}
+
 .border{
   border-width: 1px;
 }
 
 .bg-color-1{
   --tw-bg-opacity: 1;
-  background-color: rgb(46 162 204 / var(--tw-bg-opacity));
+  background-color: rgb(34 139 230 / var(--tw-bg-opacity));
 }
 
 .text-center{
   text-align: center;
+}
+
+.text-start{
+  text-align: start;
 }
 
 .\!font-primary{
@@ -668,6 +716,16 @@ video {
   text-decoration-line: none;
 }
 
+.shadow{
+  --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.outline{
+  outline-style: solid;
+}
+
 .blur{
   --tw-blur: blur(8px);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
@@ -680,7 +738,7 @@ body,div,h1,h2,h3,h4,h5,h6,span,p,*{
 
 .hover\:bg-color-1:hover{
   --tw-bg-opacity: 1;
-  background-color: rgb(46 162 204 / var(--tw-bg-opacity));
+  background-color: rgb(34 139 230 / var(--tw-bg-opacity));
 }
 
 @media (min-width: 640px){
@@ -690,8 +748,20 @@ body,div,h1,h2,h3,h4,h5,h6,span,p,*{
 }
 
 @media (min-width: 768px){
+  .md\:mr-0{
+    margin-right: 0px;
+  }
+
+  .md\:block{
+    display: block;
+  }
+
   .md\:flex{
     display: flex;
+  }
+
+  .md\:hidden{
+    display: none;
   }
 
   .md\:w-\[50\%\]{

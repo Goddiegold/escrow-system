@@ -1,7 +1,8 @@
 import BackgroundLayout from "@/components/layout/BackgroundLayout";
 import {
     Button, PasswordInput,
-    TextInput, Text
+    TextInput, Text,
+    LoadingOverlay
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
@@ -80,7 +81,12 @@ const Login = () => {
                 </Text>
             </>}
             title="Login to your account">
-            <form method="POST"  onSubmit={handleSubmit}>
+            <LoadingOverlay
+                visible={loading}
+                zIndex={1000}
+                loaderProps={{ type: "dots" }}
+                overlayProps={{ radius: "sm", blur: 2 }} />
+            <form method="POST" onSubmit={handleSubmit}>
                 <TextInput
                     onBlur={handleBlur("email")}
                     value={values.email}
