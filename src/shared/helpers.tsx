@@ -25,10 +25,10 @@ export const FRONTEND_URL = "https://delegatecapturepro.pw"
 
 export const imageUrl = "https://delegatecapturepro.pw/img/profile.png"
 
-export const LCPE_ESCROW_SYS_USER_TOKEN = 'LCPE_ESCROW_SYS_USER_TOKEN';
+export const LCPD_ESCROW_SYS_USER_TOKEN = 'LCPD_ESCROW_SYS_USER_TOKEN';
 
-export const userToken = () => localStorage.getItem(LCPE_ESCROW_SYS_USER_TOKEN)
-export const removeUserToken = () => localStorage.removeItem(LCPE_ESCROW_SYS_USER_TOKEN)
+export const userToken = () => localStorage.getItem(LCPD_ESCROW_SYS_USER_TOKEN)
+export const removeUserToken = () => localStorage.removeItem(LCPD_ESCROW_SYS_USER_TOKEN)
 
 export function decodeUserToken(token: string) {
     try {

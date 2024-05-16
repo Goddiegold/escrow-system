@@ -4,6 +4,8 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import { DashboardHome } from "./pages/dashboard/Home";
+import VerifyOtp from "./pages/VerifyOtp";
 
 const router = createBrowserRouter([
     {
@@ -11,7 +13,10 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         element: <DashboardLayout />,
         children: [
-
+            {
+                path: "/dashboard",
+                element: <DashboardHome />,
+            },
         ],
     },
     {
@@ -29,8 +34,16 @@ const router = createBrowserRouter([
             {
                 path: "/not-found",
                 element: <NotFound />
+            }, 
+            {
+                path:"/verify-otp", 
+                element:<VerifyOtp/>
             }
         ]
+    },
+    {
+        path: "*",
+        element: <NotFound />
     }
 
 ]);

@@ -7,7 +7,7 @@ import Logo from '../shared/Logo';
 interface BackgroundLayoutProps {
     title?: string,
     children: ReactNode,
-    bottomContent: ReactNode
+    bottomContent?: ReactNode
 }
 
 // "https://source.unsplash.com/1024x768/?nature",
@@ -40,11 +40,11 @@ function BackgroundLayout({ title, children, bottomContent }: BackgroundLayoutPr
                         <Text className="text-center" size="lg" fw={600}>{title}</Text>
                         {children}
                     </Paper>
-                    <Paper withBorder p={10} mt={10} radius="sm" className='w-[90%] sm:w-[350px]'>
+                    {bottomContent && <Paper withBorder p={10} mt={10} radius="sm" className='w-[90%] sm:w-[350px]'>
                         <Group justify="center" m={10}>
                             {bottomContent}
                         </Group>
-                    </Paper>
+                    </Paper>}
                 </Flex>
             </Flex>
 

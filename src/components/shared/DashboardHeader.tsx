@@ -66,9 +66,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                                             h={50}
                                             src={""}
                                         >JD</Avatar>
-                                        <Flex direction={'column'} className='hidden md:flex max-w-[70%]' align={'flex-start'}>
+                                        <Flex direction={'column'} className='hidden md:flex max-w-[80%]' align={'flex-start'}>
                                             <Text fw={700} c='dark'>John Doe</Text>
-                                            <Text size={'xs'} c={'gray'} className="!break-all text-wrap items-start text-start">johndoe@gmail.comjohndoe@gmail.com</Text>
+                                            <Text size={'xs'} c={'gray'} className="!break-all text-wrap items-start text-start">godwinehikhamhen5@gmail.com</Text>
                                         </Flex>
                                     </Flex>
                                 </Button>

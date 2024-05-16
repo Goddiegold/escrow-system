@@ -68,7 +68,7 @@ const Login = () => {
 
     const { values, touched, handleChange, handleSubmit, errors, handleBlur } = formik;
     return (
-        <BackgroundLayout
+        <BackgroundLayout 
             bottomContent={<>
                 <Text style={{ textAlign: "center" }} size="sm">
                     Don't have an account yet?{" "}

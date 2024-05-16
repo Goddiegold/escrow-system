@@ -1,8 +1,9 @@
 import { NavbarSimpleColored } from '@/components/shared/sidebar';
-import { AppShell } from '@mantine/core';
+import { AppShell, Flex,Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import DashboardHeader from '../shared/DashboardHeader';
+import { Outlet } from 'react-router-dom';
 
 export default function DashboardLayout() {
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
@@ -37,17 +38,22 @@ export default function DashboardLayout() {
         >
             <AppShell.Header >
                 <DashboardHeader
-                    toggleDesktop={toggleDesktop}
+                    // toggleDesktop={toggleDesktop}
                     toggleMobile={toggleMobile}
                     mobileOpened={mobileOpened}
-                    desktopOpened={desktopOpened}
+                // desktopOpened={desktopOpened}
                 />
             </AppShell.Header>
 
             <AppShell.Navbar >
                 <NavbarSimpleColored />
             </AppShell.Navbar>
-            <AppShell.Main>Main</AppShell.Main>
+            <AppShell.Main>
+                {/* <Flex direction={"column"} className='p-[10px] lg:p-[30px]'> */}
+                    {/* <Text>Hi there 👋, welcome 😁</Text> */}
+                    <Outlet />
+                {/* </Flex> */}
+            </AppShell.Main>
         </AppShell>
     );
 }
