@@ -1,14 +1,54 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import classes from './styles.module.css';
 
 import { IoMdLogOut } from 'react-icons/io';
 import { menuData } from '@/shared/helpers';
-import { AppShell, ScrollArea } from '@mantine/core';
+import { useUserContext } from '@/context/UserContext';
+import { user_role } from '@/shared/types';
+import { Handshake, UsersFour, Wallet } from '@phosphor-icons/react';
 
 export function NavbarSimpleColored() {
+  const { user } = useUserContext()
   const [active, setActive] = useState('Billing');
+  const [userMenuData, setMenuData] = useState(menuData)
 
-  const links = menuData.map((item) => (
+
+  useEffect(() => {
+    const copyData = [...menuData];
+    let position: number = 0;
+    let newItem: any[];
+
+    if (user?.role === user_role.vendor) {
+      position = 1;
+      newItem = [
+        {
+          link: '',
+          label: 'Wallet',
+          icon: Wallet
+        },
+      ]
+    }
+
+    if (user?.role === user_role.company) {
+      position = 1;
+      newItem = [
+        {
+          link: "",
+          label: "Registered Vendors",
+          icon: Handshake
+        },
+        {
+          icon: UsersFour,
+          label: "Customers",
+          link: ""
+        }
+      ]
+    }
+    copyData.splice(position, 0, ...newItem)
+    setMenuData(copyData)
+  }, [])
+
+  const links = userMenuData.map((item) => (
     <a
       className={classes.link}
       data-active={item.label === active || undefined}

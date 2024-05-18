@@ -2,34 +2,53 @@ import BackgroundLayout from "@/components/layout/BackgroundLayout";
 import { Button, LoadingOverlay, PasswordInput, TextInput, Text }
     from "@mantine/core";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup"
-import client from "@/shared/client";
+import client, { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
 import { At, User as UserIcon, Lock } from "@phosphor-icons/react"
+import { useUserContext } from "@/context/UserContext";
+import { Action_Type, Company, User } from "@/shared/types";
+import { useQuery } from "@tanstack/react-query";
 
 const Register = () => {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
+    const { userDispatch } = useUserContext()
+    const clientInstance = useClient()
+    const { companySlug } = useParams()
 
-    const handleLogin = async (user: { email: string, password: string }) => {
+    const { data, isLoading } = useQuery({
+        queryKey: ["company-info", companySlug],
+        queryFn: () => clientInstance().get(`/companies/${companySlug}`)
+            .then(res => res.data?.result as Company)
+            .catch(err => {
+                toast(err?.response?.data?.message).error()
+                navigate("*")
+            })
+        ,
+        enabled: !!companySlug
+    })
+
+    const handleRegister = async (user: { email: string, password: string }) => {
         try {
             setLoading(true)
-            const res = await client().post(`/users/register`, { ...user })
+            const res = await client().post(!companySlug ? `/users/register` :
+             `/users/register?companySlug=${companySlug}`, { ...user })
             setLoading(false)
             const token = res.headers["authorization"];
             toast('Logged In Successfully!').success()
-            // const userDetails = res.data?.result as User
-            // if (userDispatch) {
-            //     userDispatch({
-            //         type: Action_Type.USER_PROFILE,
-            //         payload: {
-            //             ...userDetails,
-            //             token
-            //         }
-            //     })
-            // }
+            const userDetails = res.data?.result as User
+            if (userDispatch) {
+                userDispatch({
+                    type: Action_Type.USER_PROFILE,
+                    payload: {
+                        ...userDetails,
+                        token
+                    }
+                })
+            }
             navigate("/dashboard")
         } catch (error: any) {
             setLoading(false)
@@ -49,7 +68,7 @@ const Register = () => {
             email: Yup.string().email().required().max(50).label("Email"),
             password: Yup.string().required().min(8).max(50).label("Password")
         }),
-        onSubmit: (values) => handleLogin(values)
+        onSubmit: (values) => handleRegister(values)
     })
 
     const { values, touched, handleChange, handleSubmit, errors, handleBlur } = formik;
@@ -64,10 +83,10 @@ const Register = () => {
                     </Link>
                 </Text>
             </>}
-            title="Create an account">
+            title={!companySlug ? "Create a business account" : `Create an escrow account under ${data?.name ?? "company"}`}>
 
             <LoadingOverlay
-                visible={loading}
+                visible={loading || isLoading}
                 zIndex={1000}
                 loaderProps={{ type: "dots" }}
                 overlayProps={{ radius: "sm", blur: 2 }} />
@@ -79,13 +98,13 @@ const Register = () => {
                     value={values.name}
                     onChange={handleChange("name")}
                     leftSection={<UserIcon size={20} />}
-                    error={errors.name ? errors.name : null}
+                    error={errors.name && touched.name ? errors.name : null}
                 />
                 <TextInput
                     onBlur={handleBlur("email")}
                     value={values.email}
                     onChange={handleChange("email")}
-                    error={errors.email ? errors.email : null}
+                    error={errors.email && touched.email ? errors.email : null}
                     label="Email"
                     leftSection={<At size={20} />}
                     my={10} />
@@ -95,7 +114,7 @@ const Register = () => {
                     value={values.password}
                     onChange={handleChange("password")}
                     leftSection={<Lock size={20} />}
-                    error={errors.password ? errors.password : null}
+                    error={errors.password && touched.password ? errors.password : null}
                     label="Password"
                     my={10} />
                 <Button my={10} type="submit">Register</Button>

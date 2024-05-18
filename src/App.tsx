@@ -1,10 +1,11 @@
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications';
-import '@mantine/core/styles.css';
-import "@mantine/notifications/styles.css";
 import { RouterProvider } from 'react-router-dom';
 import router from './routes';
 import { useColorScheme, useHotkeys, useLocalStorage } from '@mantine/hooks';
+import '@mantine/core/styles.css';
+import "@mantine/notifications/styles.css";
+import '@mantine/dates/styles.css';
 
 export default function App() {
   const defaultColorScheme = useColorScheme();
@@ -22,7 +23,7 @@ export default function App() {
 
   return (
     <>
-      <ColorSchemeScript defaultColorScheme={defaultColorScheme} localStorageKey=''/>
+      <ColorSchemeScript defaultColorScheme={defaultColorScheme} localStorageKey='' />
       <MantineProvider
         withCssVariables
         withGlobalClasses

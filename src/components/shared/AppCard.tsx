@@ -1,6 +1,5 @@
 import { Card, Flex, Text } from "@mantine/core";
-import { Newspaper } from "@phosphor-icons/react";
-import { ReactNode } from "react";
+import { Icon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 
 
@@ -9,21 +8,22 @@ interface AppCardProps {
     action: string,
     actionPath: string,
     totalNumber: number | string,
-    icon?: ReactNode
+    icon?: Icon
 }
 
 const AppCard: React.FC<AppCardProps> = ({ ...props }) => {
-    const { title, action, totalNumber, actionPath, icon } = props
+    const { title, action, totalNumber, actionPath, icon: CardIcon } = props
     return (
         <Card
             mih={150}
             withBorder
-            shadow="md"
+            shadow="sm"
             className={`rounded-xl bg-white py-6 px-7  
             font-3 flex flex-col justify-between`}>
             <Flex className="flex flex-row justify-between">
                 <Text size={'md'} className="" fw={600}>{title}</Text>
-                {icon}
+                {/* {icon} */}
+                {props.icon && <CardIcon size={20} color="gray" />}
             </Flex>
             <Text fw={600} size={"24px"} my={5}>{totalNumber}</Text>
             {/* <Link to={actionPath}

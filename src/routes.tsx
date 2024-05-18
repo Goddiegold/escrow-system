@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { DashboardHome } from "./pages/dashboard/Home";
 import VerifyOtp from "./pages/VerifyOtp";
+import Settings from "./pages/dashboard/Settings";
+import Orders from "./pages/dashboard/Orders";
 
 const router = createBrowserRouter([
     {
@@ -16,6 +18,18 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard",
                 element: <DashboardHome />,
+            },
+            {
+                path: "/dashboard/orders",
+                element: <Orders />,
+            },
+            {
+                path: "/dashboard/settings",
+                element: <Settings />,
+            },
+            {
+                path: "/dashboard/settings/:tabValue",
+                element: <Settings />,
             },
         ],
     },
@@ -32,12 +46,20 @@ const router = createBrowserRouter([
                 element: <Register />,
             },
             {
+                path: "/login/:companySlug",
+                element: <Login />,
+            },
+            {
+                path: "/register/:companySlug",
+                element: <Register />,
+            },
+            {
                 path: "/not-found",
                 element: <NotFound />
-            }, 
+            },
             {
-                path:"/verify-otp", 
-                element:<VerifyOtp/>
+                path: "/verify-otp",
+                element: <VerifyOtp />
             }
         ]
     },

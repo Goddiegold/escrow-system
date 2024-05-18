@@ -8,7 +8,7 @@ import { Action_Type, User, UserContextType } from '@/shared/types';
 import { useClient } from '@/shared/client';
 import { useQuery } from '@tanstack/react-query';
 import AppLoader from '../components/shared/AppLoader';
-import { GUARDIAN_EPAPER_USER_TOKEN, removeUserToken, toast, userToken } from '@/shared/helpers';
+import { LCPD_ESCROW_SYS_USER_TOKEN, removeUserToken, toast, userToken } from '@/shared/helpers';
 
 
 const UserContext = createContext<UserContextType>({});
@@ -16,12 +16,18 @@ const UserContext = createContext<UserContextType>({});
 const userReducer = (state: any, action: { payload?: any, type: Action_Type }) => {
     switch (action.type) {
         case Action_Type.USER_PROFILE:
-            localStorage.setItem(GUARDIAN_EPAPER_USER_TOKEN, action.payload.token ?? state?.token)
-            // console.log("state", state)
-            return { ...state, ...action.payload };
+            localStorage.setItem(LCPD_ESCROW_SYS_USER_TOKEN, 
+                action.payload.token ?? state?.token)
+            return {
+                ...state, ...action.payload,
+                isLoggedIn: true
+            };
         case Action_Type.LOGOUT_USER:
             removeUserToken()
-            return {};
+            return {
+                // user: null,
+                isLoggedIn: false
+            };
         default:
             return null
     }
@@ -34,6 +40,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
     const contextValue: UserContextType = {
         user,
+        isLoggedIn: user?.isLoggedIn,
         userDispatch: userDispatch as React.Dispatch<{ payload?: any; type: Action_Type }>,
     };
 
