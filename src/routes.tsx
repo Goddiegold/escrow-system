@@ -7,7 +7,8 @@ import Register from "./pages/Register";
 import { DashboardHome } from "./pages/dashboard/Home";
 import VerifyOtp from "./pages/VerifyOtp";
 import Settings from "./pages/dashboard/Settings";
-import Orders from "./pages/dashboard/Orders";
+import Orders from "./pages/dashboard/CompanyOrders";
+import RegisteredVendors from "./pages/dashboard/RegisteredVendors";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard",
                 element: <DashboardHome />,
+            },
+            {
+                path: "/dashboard/registered-vendors",
+                element: <RegisteredVendors />
             },
             {
                 path: "/dashboard/orders",

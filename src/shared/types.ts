@@ -34,18 +34,20 @@ export interface UserContextType {
 
 
 export type Order = {
-    id: string
-    productId: string
-    productDetails: string | null
-    productName: string
-    vendorId: string | null
-    customerId: string | null
-    amount: number | null
-    vendorDelivered: boolean
-    vendorDeliveredOn: Date | null
-    userReceived: boolean
-    userReceivedOn: Date | null
-    companyId: string | null
-    createdAt: Date
-    updatedAt: Date
+    id: string,
+    productId: string,
+    productDetails: string | null,
+    productName: string,
+    vendorId: string | null,
+    vendor: User | null,
+    customerId: string | null,
+    customer: User | null,
+    amount: number | null,
+    vendorDelivered: boolean,
+    vendorDeliveredOn: Date | null,
+    userReceived: boolean,
+    userReceivedOn: Date | null,
+    companyId: string | null,
+    createdAt: Date,
+    updatedAt: Date,
 }

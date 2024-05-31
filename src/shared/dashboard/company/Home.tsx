@@ -47,14 +47,14 @@ const DashboardHome = () => {
             title: "Registered Vendors",
             action: "view vendors",
             count: vendors?.data?.length ?? 0,
-            path: "#",
+            path: "/dashboard/registered-vendors",
             icon: Handshake
         },
         {
             title: "Orders",
             action: "view orders",
             count: orders?.data?.length ?? 0,
-            path: "#",
+            path: "/dashboard/orders",
             icon: ShoppingCartSimple
         }
     ]

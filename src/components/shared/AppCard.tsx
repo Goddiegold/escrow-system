@@ -29,7 +29,8 @@ const AppCard: React.FC<AppCardProps> = ({ ...props }) => {
             {/* <Link to={actionPath}
                 state={{ prevPath: window.location.pathname }}
                 className="cursor-pointer underline text-gray-300 text-xs text-muted-foreground">{action}</Link> */}
-            <Link to={actionPath} state={{ prevPath: window.location.pathname }} className="cursor-pointer underline text-gray-400 font-normal">{action}</Link>
+            <Link to={actionPath}
+                state={{ prevPath: window.location.pathname }} className="cursor-pointer underline text-gray-400 font-normal">{action}</Link>
         </Card>
     );
 }

@@ -46,7 +46,7 @@ export function NavbarSimpleColored() {
     }
     copyData.splice(position, 0, ...newItem)
     setMenuData(copyData)
-  }, [])
+  }, [user]);
 
   const links = userMenuData.map((item) => (
     <a

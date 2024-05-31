@@ -57,20 +57,21 @@ export default function DashboardLayout() {
                 </AppShell.Navbar>
                 <AppShell.Main bg={"rgb(248, 249, 250)"}>
                     <Flex direction={"column"} p={10}>
-                    {location.pathname === "/dashboard" && <Flex direction={"row"} justify={"space-between"}>
-                             <Text my={10} fw={600} size='lg'>Hi there {user?.name} 👋, welcome 😁</Text>
-                            {isLoggedIn && user?.role === user_role.company ?
-                                <CopyButton value={`${window.origin}/register/${user?.company?.slug}`}>
-                                    {({ copied, copy }) => (
-                                        <Tooltip label="Unique registration link For your vendors" withArrow>
-                                            <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
-                                                {copied ? 'Copied url' : 'Copy Url'}
-                                            </Button>
-                                        </Tooltip>
-                                    )}
-                                </CopyButton>
-                                : null}
-                        </Flex>} 
+                        {location.pathname === "/dashboard" &&
+                            <Flex direction={"row"} justify={"space-between"}>
+                                <Text my={10} fw={600} size='lg'>Hi there {user?.name} 👋, welcome 😁</Text>
+                                {isLoggedIn && user?.role === user_role.company ?
+                                    <CopyButton value={`${window.origin}/register/${user?.company?.slug}`}>
+                                        {({ copied, copy }) => (
+                                            <Tooltip label="Unique registration link For your vendors" withArrow>
+                                                <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
+                                                    {copied ? 'Copied url' : 'Copy Url'}
+                                                </Button>
+                                            </Tooltip>
+                                        )}
+                                    </CopyButton>
+                                    : null}
+                            </Flex>}
                         <Outlet />
                         {isLoggedIn && user?.id && user?.role === user_role.company && !user?.company ? <RegisterCompanyModal /> : null}
                     </Flex>
