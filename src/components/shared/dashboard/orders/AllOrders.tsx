@@ -2,22 +2,22 @@ import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
 import { useQuery } from "@tanstack/react-query";
-import { Order as OrderType, order_status } from "@/shared/types";
+import { Order as OrderType, order_status, user_role } from "@/shared/types";
 import {
     Badge, Center, Flex, NumberFormatter,
     Skeleton, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
-import { Link } from "react-router-dom";
-
+import { Link, useParams } from "react-router-dom";
 
 const AllOrders = () => {
     const clientInstance = useClient()
     const { user } = useUserContext()
+    const { companyId } = useParams()
 
     const { data, isLoading } = useQuery({
-        queryKey: ["all-orders", user?.id],
-        queryFn: () => clientInstance().get(`/orders/company-orders/${user?.companyId}`)
+        queryKey: ["all-orders", companyId ?? user?.id],
+        queryFn: () => clientInstance().get(`/orders/company-orders/${companyId ?? user?.companyId}`)
             .then(res => res.data?.result as OrderType[])
             .catch(err => {
                 toast(err?.response?.data?.message).error();
@@ -25,6 +25,7 @@ const AllOrders = () => {
             }),
     })
 
+    const isNotVendor = (user?.role === user_role.admin) || (user?.role === user_role.company)
     return (
         <>
             {isLoading && <Flex w={"100%"}>
@@ -38,6 +39,7 @@ const AllOrders = () => {
                 {!isLoading && <Table.Thead >
                     <Table.Tr>
                         <Table.Th>Customer</Table.Th>
+                        {isNotVendor && <Table.Th>Vendor</Table.Th>}
                         <Table.Th>Product</Table.Th>
                         <Table.Th>Delivered</Table.Th>
                         <Table.Th>Customer Confirmed</Table.Th>
@@ -57,6 +59,13 @@ const AllOrders = () => {
                                     </Flex>
                                 </Table.Td>
 
+                                {isNotVendor && <Table.Td>
+                                    <Text fz="sm">{item?.vendor?.name}</Text>
+                                    <Text fz={"xs"} c={"dimmed"}>{item?.vendor?.email}</Text>
+                                    <Link
+                                        to={"#"}
+                                        className="text-color-1 text-xs underline">more orders</Link>
+                                </Table.Td>}
 
                                 <Table.Td>
                                     <Flex direction={"column"}>

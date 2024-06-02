@@ -764,11 +764,6 @@ video {
   font-family: Roboto !important;
 }
 
-.\!text-xs{
-  font-size: 0.75rem !important;
-  line-height: 1rem !important;
-}
-
 .text-\[15rem\]{
   font-size: 15rem;
 }
@@ -776,10 +771,6 @@ video {
 .text-xs{
   font-size: 0.75rem;
   line-height: 1rem;
-}
-
-.\!font-normal{
-  font-weight: 400 !important;
 }
 
 .font-black{

@@ -2,28 +2,32 @@ import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
 import { useQuery } from "@tanstack/react-query";
-import { Order as OrderType } from "@/shared/types";
+import { Order as OrderType, user_role } from "@/shared/types";
 import {
     Badge, Center, Flex, NumberFormatter,
     Skeleton, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 
 const SuccessfullPendingDeliveries = () => {
     const clientInstance = useClient()
     const { user } = useUserContext()
+    const { companyId } = useParams()
 
     const { data, isLoading } = useQuery({
-        queryKey: ["successfull-orders", user?.id],
-        queryFn: () => clientInstance().get(`/orders/company-orders/${user?.companyId}?status=delivered`)
+        queryKey: ["successfull-orders", companyId ?? user?.id],
+        queryFn: () => clientInstance().get(`/orders/company-orders/${companyId ?? user?.companyId}?status=delivered`)
             .then(res => res.data?.result as OrderType[])
             .catch(err => {
                 toast(err?.response?.data?.message).error();
                 return [] as OrderType[]
             }),
     })
+
+    const isNotVendor = (user?.role === user_role.admin) || (user?.role === user_role.company)
+
 
     return (
         <>
@@ -38,6 +42,7 @@ const SuccessfullPendingDeliveries = () => {
                 {!isLoading && <Table.Thead >
                     <Table.Tr>
                         <Table.Th>Customer</Table.Th>
+                        {isNotVendor && <Table.Th>Vendor</Table.Th>}
                         <Table.Th>Product</Table.Th>
                         <Table.Th>Delivered</Table.Th>
                         <Table.Th>Customer Confirmed</Table.Th>
@@ -56,6 +61,14 @@ const SuccessfullPendingDeliveries = () => {
                                             className="text-color-1 text-xs underline">more orders</Link>
                                     </Flex>
                                 </Table.Td>
+
+                                {isNotVendor && <Table.Td>
+                                    <Text fz="sm">{item?.vendor?.name}</Text>
+                                    <Text fz={"xs"} c={"dimmed"}>{item?.vendor?.email}</Text>
+                                    <Link
+                                        to={"#"}
+                                        className="text-color-1 text-xs underline">more orders</Link>
+                                </Table.Td>}
 
 
                                 <Table.Td>

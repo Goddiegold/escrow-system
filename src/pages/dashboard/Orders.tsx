@@ -1,21 +1,27 @@
 import BackBtn from "@/components/shared/BackBtn";
-import AllOrders from "@/components/shared/dashboard/vendors/orders/AllOrders";
-import OrderPendingDeliveries from "@/components/shared/dashboard/vendors/orders/OrderPendingDeliveries";
-import OrderSuccessfullDeliveries from "@/components/shared/dashboard/vendors/orders/OrderSuccessfullDeliveries";
+import AllOrders from "@/components/shared/dashboard/orders/AllOrders";
+import OrderPendingDeliveries from "@/components/shared/dashboard/orders/OrderPendingDeliveries";
+import OrderSuccessfullDeliveries from "@/components/shared/dashboard/orders/OrderSuccessfullDeliveries";
 
-import CompanyOrders from "@/components/shared/dashboard/company/orders/AllOrders";
 
-import { useUserContext } from "@/context/UserContext";
-import { user_role } from "@/shared/types";
 import { Card, Flex, ScrollArea, Tabs, rem } from "@mantine/core";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ListChecks, ShoppingCart, XCircle } from "@phosphor-icons/react";
+
+
+const useQueryURL = () => {
+    const { search } = useLocation()
+    return new URLSearchParams(search);
+};
+
 
 const Orders = () => {
     const navigate = useNavigate();
     const { tabValue } = useParams();
-    const { user } = useUserContext()
     const iconStyle = { width: rem(15), height: rem(15) };
+    const queryURL = useQueryURL();
+
+    const vendorId = queryURL.get("vendorId")
 
     return (
         <Flex direction={"column"}>
@@ -45,17 +51,15 @@ const Orders = () => {
                     </Tabs.List>
 
                     <Tabs.Panel value="all" mt={20}>
-                        {user?.role === user_role.vendor && <AllOrders />}
-                        {user?.role === user_role.admin ||
-                            user?.role === user_role.company && <CompanyOrders />}
+                        <AllOrders />
                     </Tabs.Panel>
 
                     <Tabs.Panel value="pending-deliveries" mt={20}>
-                        {user?.role === user_role.vendor && <OrderPendingDeliveries />}
+                        <OrderPendingDeliveries />
                     </Tabs.Panel>
 
                     <Tabs.Panel value="successfull-deliveries" mt={20}>
-                        {user?.role === user_role.vendor && <OrderSuccessfullDeliveries />}
+                        <OrderSuccessfullDeliveries />
                     </Tabs.Panel>
                 </Tabs>
             </Card>

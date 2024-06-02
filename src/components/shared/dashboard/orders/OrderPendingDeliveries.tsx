@@ -2,15 +2,15 @@ import { useUserContext } from "@/context/UserContext";
 import client, { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Order, Order as OrderType, order_status } from "@/shared/types";
+import { Order, Order as OrderType, order_status, user_role } from "@/shared/types";
 import {
     ActionIcon,
-    Badge, Button, Center, Flex, NumberFormatter,
+    Badge, Center, Flex, NumberFormatter,
     Select,
     Skeleton, Space, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import { Check, X } from "@phosphor-icons/react";
 
@@ -23,6 +23,9 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
     const queryClient = useQueryClient()
     const [loading, setLoading] = useState(false)
     const { user } = useUserContext()
+    const { companyId } = useParams()
+
+    const isNotVendor = (user?.role === user_role.admin) || (user?.role === user_role.company)
 
     const handleUpdateOrderStatus = async () => {
         try {
@@ -76,6 +79,13 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
                         className="text-color-1 text-xs underline">more orders</Link>
                 </Flex>
             </Table.Td>
+            {isNotVendor && <Table.Td>
+                <Text fz="sm">{item?.vendor?.name}</Text>
+                <Text fz={"xs"} c={"dimmed"}>{item?.vendor?.email}</Text>
+                <Link
+                    to={"#"}
+                    className="text-color-1 text-xs underline">more orders</Link>
+            </Table.Td>}
 
 
             <Table.Td>
@@ -130,16 +140,19 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
 const OrderPendingDeliveries = () => {
     const clientInstance = useClient()
     const { user } = useUserContext()
+    const { companyId } = useParams()
 
     const { data, isLoading } = useQuery({
-        queryKey: ["pending-orders", user?.id],
-        queryFn: () => clientInstance().get(`/orders/company-orders/${user?.companyId}?status=pending`)
+        queryKey: ["pending-orders", companyId ?? user?.id],
+        queryFn: () => clientInstance().get(`/orders/company-orders/${companyId ?? user?.companyId}?status=pending`)
             .then(res => res.data?.result as OrderType[])
             .catch(err => {
                 toast(err?.response?.data?.message).error();
                 return [] as OrderType[]
             }),
     })
+
+    const isNotVendor = (user?.role === user_role.admin) || (user?.role === user_role.company)
 
     return (
         <>
@@ -154,6 +167,7 @@ const OrderPendingDeliveries = () => {
                 {!isLoading && <Table.Thead >
                     <Table.Tr>
                         <Table.Th>Customer</Table.Th>
+                        {isNotVendor && <Table.Th>Vendor</Table.Th>}
                         <Table.Th>Product</Table.Th>
                         <Table.Th>Delivered</Table.Th>
                         <Table.Th>Customer Confirmed</Table.Th>

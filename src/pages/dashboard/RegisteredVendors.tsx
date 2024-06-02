@@ -21,7 +21,7 @@ const RegisteredVendors = () => {
     const clientInstance = useClient();
 
     const { data, isLoading } = useQuery({
-        queryKey: isAdmin ? ["registered-vendors"] : ["registered-vendors", isAdmin],
+        queryKey: ["registered-vendors", user?.id],
         queryFn: () => clientInstance().get(`/companies/get-users?role=${user_role.vendor}`)
             .then(res => res?.data?.result as User[])
             .catch(err => {
@@ -60,7 +60,7 @@ const RegisteredVendors = () => {
                                         {item.email}
                                     </Table.Td>
                                     <Table.Td>
-                                        <Link to={"#"} className="text-color-1 underline">Orders</Link>
+                                        <Link to={`/dashboard/orders/${item?.companyId}/?vendorId=${item.id}`} className="text-color-1 underline">Orders</Link>
                                     </Table.Td>
                                 </Table.Tr>
                             ))}

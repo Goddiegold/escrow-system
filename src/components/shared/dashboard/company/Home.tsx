@@ -2,7 +2,7 @@ import AppCard from "@/components/shared/AppCard";
 import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
-import { Order, User, user_role } from "@/shared/types";
+import { Order, User, order_status, user_role } from "@/shared/types";
 import { Grid, Skeleton } from "@mantine/core";
 import { Handshake, ShoppingCartSimple } from "@phosphor-icons/react";
 import { useQueries } from "@tanstack/react-query";
@@ -51,12 +51,12 @@ const DashboardHome = () => {
             icon: Handshake
         },
         {
-            title: "Orders",
+            title: "All Orders",
             action: "view orders",
             count: orders?.data?.length ?? 0,
-            path: "/dashboard/company-orders",
+            path: "/dashboard/orders",
             icon: ShoppingCartSimple
-        }
+        },
     ]
 
     const isLoading = queryResult.find(item => item.isLoading)

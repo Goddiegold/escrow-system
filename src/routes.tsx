@@ -33,21 +33,9 @@ const router = createBrowserRouter([
                 element: <Orders />,
             },
             {
-                path: "/dashboard/orders/:tabValue/:companyId",
+                path: "/dashboard/orders/:companyId/:tabValue",
                 element: <Orders />,
             },
-            // {
-            //     path: "/dashboard/company-orders",
-            //     element: <CompanyOrders />,
-            // },
-            // {
-            //     path: "/dashboard/company-orders",
-            //     element: <CompanyOrders />,
-            // },
-            // {
-            //     path: "/dashboard/company-orders/:companyId",
-            //     element: <CompanyOrders />,
-            // },
             {
                 path: "/dashboard/settings",
                 element: <Settings />,
