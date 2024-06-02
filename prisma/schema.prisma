@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum user_role {
+  vendor   @map("vendor")
+  company  @map("company")
+  customer @map("customer")
+  admin    @map("admin")
+}
+
+model Company {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String?
+  slug      String?
+  orders    Order[]
+  ratings   Rating[]
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String
+  password      String?
+  emailVerified Boolean   @default(false)
+  role          user_role
+  otp           String? //one time link
+  otpDuration   DateTime? //one time link
+  phone         String?
+
+  vendorOrders   Order[] @relation("vendorOrders") //belongs to the vendor
+  customerOrders Order[] @relation("customerOrders") //belongs to the customer
+
+  vendorRatings   Rating[] @relation("vendorRatings")
+  customerRatings Rating[] @relation("customerRatings")
+
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  companyId String?  @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  productId      String
+  productDetails String?
+  productName    String
+
+  vendorId String? @db.ObjectId
+  vendor   User?   @relation("vendorOrders", fields: [vendorId], references: [id], onDelete: SetNull)
+
+  customerId String? @db.ObjectId
+  customer   User?   @relation("customerOrders", fields: [customerId], references: [id], onDelete: SetNull)
+
+  amount Float?
+
+  vendorDelivered   Boolean   @default(false)
+  vendorDeliveredOn DateTime?
+
+  userReceived   Boolean   @default(false)
+  userReceivedOn DateTime?
+
+  userPaid   Boolean   @default(false)
+  userPaidOn DateTime?
+
+  rating Rating?
+
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?  @db.ObjectId
+
+  order_status order_status @default(pending)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum order_status {
+  pending   @map("pending")
+  delivered @map("delivered")
+  cancelled @map("cancelled")
+}
+
+model Rating {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  value  Float?
+  review String?
+
+  vendorId String? @db.ObjectId
+  vendor   User?   @relation("vendorRatings", fields: [vendorId], references: [id], onDelete: SetNull)
+
+  customerId String? @db.ObjectId
+  customer   User?   @relation("customerRatings", fields: [customerId], references: [id], onDelete: SetNull)
+
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String @unique @db.ObjectId
+
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  companyId String?  @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
