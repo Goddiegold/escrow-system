@@ -2,7 +2,7 @@ import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
 import { useQuery } from "@tanstack/react-query";
-import { Order as OrderType } from "@/shared/types";
+import { Order as OrderType, order_status } from "@/shared/types";
 import {
     Badge, Center, Flex, NumberFormatter,
     Skeleton, Table, Text
@@ -16,7 +16,7 @@ const AllOrders = () => {
     const { user } = useUserContext()
 
     const { data, isLoading } = useQuery({
-        queryKey: ["all-orders", user?.companyId, user?.id],
+        queryKey: ["all-orders", user?.id],
         queryFn: () => clientInstance().get(`/orders/company-orders/${user?.companyId}`)
             .then(res => res.data?.result as OrderType[])
             .catch(err => {
@@ -70,12 +70,13 @@ const AllOrders = () => {
                                 </Table.Td>
 
                                 <Table.Td>
-                                    {item.vendorDelivered}
-                                    <Badge
-                                        // size=""
-                                        color={item.vendorDelivered ? "green" : "orange"}>
-                                        {item.vendorDelivered ? "success" : "pending"}
-                                    </Badge>
+                                    {(item.order_status === order_status.pending) ||
+                                        (item.order_status === order_status.delivered) ?
+                                        <Badge
+                                            color={item.order_status === order_status.delivered ? "green" : "orange"}>
+                                            {item.order_status === order_status.delivered ? "success" : "pending"}
+                                        </Badge> :
+                                        <Badge color="red">{item.order_status}</Badge>}
                                 </Table.Td>
 
                                 <Table.Td>

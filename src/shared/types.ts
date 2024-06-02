@@ -56,4 +56,5 @@ export type Order = {
     companyId: string | null,
     createdAt: Date,
     updatedAt: Date,
+    order_status: order_status
 }

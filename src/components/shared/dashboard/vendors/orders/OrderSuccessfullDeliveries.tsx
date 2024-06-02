@@ -16,8 +16,8 @@ const SuccessfullPendingDeliveries = () => {
     const { user } = useUserContext()
 
     const { data, isLoading } = useQuery({
-        queryKey: ["successfull-orders", user?.companyId, user?.id],
-        queryFn: () => clientInstance().get(`/orders/company-orders/${user?.companyId}?status=success`)
+        queryKey: ["successfull-orders", user?.id],
+        queryFn: () => clientInstance().get(`/orders/company-orders/${user?.companyId}?status=delivered`)
             .then(res => res.data?.result as OrderType[])
             .catch(err => {
                 toast(err?.response?.data?.message).error();

@@ -764,6 +764,11 @@ video {
   font-family: Roboto !important;
 }
 
+.\!text-xs{
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+}
+
 .text-\[15rem\]{
   font-size: 15rem;
 }
@@ -773,9 +778,8 @@ video {
   line-height: 1rem;
 }
 
-.\!text-xs{
-  font-size: 0.75rem !important;
-  line-height: 1rem !important;
+.\!font-normal{
+  font-weight: 400 !important;
 }
 
 .font-black{
@@ -788,10 +792,6 @@ video {
 
 .font-normal{
   font-weight: 400;
-}
-
-.\!font-normal{
-  font-weight: 400 !important;
 }
 
 .leading-\[1\]{
@@ -843,6 +843,10 @@ video {
 
 .blur{
   --tw-blur: blur(8px);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.filter{
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
