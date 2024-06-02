@@ -59,7 +59,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
             })
             toast(err?.response?.data?.message).error()
         }),
-        // enabled: !!token && userLocation.includes("dashboard") && userLocation.includes("onboarding")
+        enabled: !!token 
     })
 
     if (data && !user?.name) {

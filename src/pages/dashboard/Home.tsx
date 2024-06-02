@@ -1,7 +1,8 @@
 import { useUserContext } from '@/context/UserContext';
 import { user_role } from '@/shared/types';
 import { Grid } from '@mantine/core';
-import CompanyDashboardHome from "@/shared/dashboard/company/Home";
+import CompanyDashboardHome from "@/components/shared/dashboard/company/Home";
+import VendorDashboardHome from "@/components/shared/dashboard/vendors/Home";
 
 
 export function DashboardHome() {
@@ -10,6 +11,7 @@ export function DashboardHome() {
         <>
             <Grid>
                 {user?.role === user_role.company && <CompanyDashboardHome />}
+                {user?.role === user_role.vendor && <VendorDashboardHome />}
             </Grid>
 
 

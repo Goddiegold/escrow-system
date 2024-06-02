@@ -21,6 +21,12 @@ export enum user_role {
     admin = "admin"
 }
 
+export enum order_status {
+    pending = 'pending',
+    delivered = 'delivered',
+    cancelled = 'cancelled'
+}
+
 export enum Action_Type {
     USER_TOKEN = "USER_TOKEN",
     USER_PROFILE = "USER_PROFILE",

@@ -7,8 +7,8 @@ import Register from "./pages/Register";
 import { DashboardHome } from "./pages/dashboard/Home";
 import VerifyOtp from "./pages/VerifyOtp";
 import Settings from "./pages/dashboard/Settings";
-import Orders from "./pages/dashboard/CompanyOrders";
 import RegisteredVendors from "./pages/dashboard/RegisteredVendors";
+import Orders from "./pages/dashboard/Orders";
 
 const router = createBrowserRouter([
     {
@@ -28,6 +28,26 @@ const router = createBrowserRouter([
                 path: "/dashboard/orders",
                 element: <Orders />,
             },
+            {
+                path: "/dashboard/orders/:tabValue",
+                element: <Orders />,
+            },
+            {
+                path: "/dashboard/orders/:tabValue/:companyId",
+                element: <Orders />,
+            },
+            // {
+            //     path: "/dashboard/company-orders",
+            //     element: <CompanyOrders />,
+            // },
+            // {
+            //     path: "/dashboard/company-orders",
+            //     element: <CompanyOrders />,
+            // },
+            // {
+            //     path: "/dashboard/company-orders/:companyId",
+            //     element: <CompanyOrders />,
+            // },
             {
                 path: "/dashboard/settings",
                 element: <Settings />,

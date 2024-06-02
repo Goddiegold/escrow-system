@@ -1,5 +1,5 @@
-import ProfileSettings from "@/shared/dashboard/settings/ProfileSettings";
-import Security from "@/shared/dashboard/settings/Security";
+import ProfileSettings from "@/components/shared/dashboard/settings/ProfileSettings";
+import Security from "@/components/shared/dashboard/settings/Security";
 import { Card, Tabs } from "@mantine/core";
 import { LockKey, UserCircle } from "@phosphor-icons/react";
 import { useNavigate, useParams } from "react-router-dom";

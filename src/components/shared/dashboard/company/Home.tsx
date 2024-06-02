@@ -54,7 +54,7 @@ const DashboardHome = () => {
             title: "Orders",
             action: "view orders",
             count: orders?.data?.length ?? 0,
-            path: "/dashboard/orders",
+            path: "/dashboard/company-orders",
             icon: ShoppingCartSimple
         }
     ]
