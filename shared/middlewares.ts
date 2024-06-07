@@ -33,7 +33,6 @@ export const userAuth = async (req: Request, res: Response, next: NextFunction) 
         next()
     } catch (error) {
         console.log(error)
-        // if(error instanceof J)
         return res.status(401).json({ message: "Not authorized !" })
     }
 }

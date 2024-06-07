@@ -28,6 +28,7 @@ export default class CompanyController implements IControllerBase {
 
         this.router.get("/get-users",
             [userAuth, requireRole([user_role.company, user_role.admin])], this.getUsers)
+        // this.router.get("/all-customers",)
         this.router.post("/register", [userAuth, requireRole([user_role.company])], this.addCompanyInfo)
         this.router.get("/:companySlug", this.getCompanyInfo)
     }
@@ -42,11 +43,11 @@ export default class CompanyController implements IControllerBase {
                 filter["companyId"] = req?.user?.companyId
             }
             const result = await this.prisma.user.findMany({
-                select: { id: true, email: true, name: true, createdAt: true },
+                select: { id: true, email: true, name: true, createdAt: true, companyId: true },
                 where: { role: userRole, ...filter }
             });
             return res.status(201).json({ result })
-        } catch (error) {   
+        } catch (error) {
             return res.status(500).json(errorMessage(error))
         }
     }

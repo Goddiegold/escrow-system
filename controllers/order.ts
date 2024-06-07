@@ -1,16 +1,10 @@
 import {
-    comparePasswords,
     errorMessage,
-    filterUserProfile,
-    generateAuthToken,
-    generateHashedPassword,
-    generateOTL,
-    uploadFile,
     validateRequestBody
 } from '../shared/helpers';
-import { Router, Request, Response, query } from 'express';
+import { Router, Response } from 'express';
 import { AuthenticatedRequest, IControllerBase, RequestType } from '../shared/types';
-import { requireRole, upload, userAuth } from '../shared/middlewares';
+import { requireRole, userAuth } from '../shared/middlewares';
 import { PrismaClient, User, order_status, user_role } from '@prisma/client';
 
 export default class OrderController implements IControllerBase {
@@ -28,6 +22,10 @@ export default class OrderController implements IControllerBase {
             user_role.admin,
             user_role.vendor])],
             this.getCompanyOrders)
+
+        this.router.get("/vendor-orders/:vendorId",
+            [userAuth, requireRole([user_role.company, user_role.admin])],
+            this.retrieveVendorOrders)
 
         this.router.get("/:orderId", this.getOrder)
             .patch("/:orderId", [userAuth, requireRole([user_role.vendor,
@@ -119,11 +117,12 @@ export default class OrderController implements IControllerBase {
                 if (req?.user.companyId !== companyId) {
                     return res.status(403).json({ message: "Forbidden!" })
                 }
-            }
 
-            if (req?.user?.role === user_role.vendor) {
-                //@ts-ignore
-                filter["vendorId"] = req?.user?.id
+                const isVendor = req?.user?.role === user_role.vendor;
+                if (isVendor) {
+                    //@ts-ignore
+                    filter["vendorId"] = req?.user?.id;
+                }
             }
 
             const result = await this.prisma.order.findMany({
@@ -157,11 +156,19 @@ export default class OrderController implements IControllerBase {
     updateOrder = async (req: AuthenticatedRequest, res: Response) => {
         try {
             const orderId = req?.params?.orderId;
+            // const data = {};
+            const filter = {};
+
+            if (req.user?.role === user_role.vendor) {
+                //@ts-ignore
+                filter["vendorId"] = req?.user?.id
+            }
 
             const result = await this.prisma.order.findFirst({
                 where: {
-                    id: orderId, 
-                    companyId: req?.user?.companyId
+                    id: orderId,
+                    companyId: req?.user?.companyId,
+                    ...filter,
                 }
             })
 
@@ -175,13 +182,58 @@ export default class OrderController implements IControllerBase {
                 return res.status(400).json({ message: "Something went wrong!" })
             }
 
-
             await this.prisma.order.update({
                 where: { id: orderId },
                 data: { order_status: orderStatus }
             })
 
             return res.status(200).json({ message: "Update order status successfully!" })
+        } catch (error) {
+            return res.status(500).json(errorMessage(error))
+        }
+    }
+
+    retrieveVendorOrders = async (req: AuthenticatedRequest, res: Response) => {
+        try {
+            const vendorId = req?.params?.vendorId;
+
+            const status = req?.query?.status as order_status;
+            const filter = {};
+
+            if (status) {
+                const statusValue = (status === order_status.pending ||
+                    status === order_status.delivered) ? status : undefined;
+                if (statusValue === undefined) {
+                    return res.status(400).json({ message: "Something went wrong!" })
+                }
+
+                //@ts-ignore
+                filter["order_status"] = statusValue;
+            }
+
+            const vendorExist = await this.prisma.user.findFirst({
+                where: { role: user_role.vendor, id: vendorId }
+            })
+
+            if (!vendorExist) {
+                return res.status(404).json({ message: "Vendor doesn't exist!" })
+            }
+
+            if (req?.user?.role === user_role.company &&
+                req?.user?.companyId !== vendorExist.companyId) {
+                return res.status(403).json({ message: "Forbidden!", redirect: true })
+            }
+
+            const result = await this.prisma.order.findMany({
+                orderBy: { createdAt: "desc" },
+                include: {
+                    vendor: { select: { id: true, name: true, email: true } },
+                    customer: { select: { id: true, name: true, email: true, } },
+                    company: { select: { id: true, name: true, email: true } }
+                },
+                where: { vendorId, ...filter }
+            })
+            return res.status(200).json({ result })
         } catch (error) {
             return res.status(500).json(errorMessage(error))
         }
