@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react';
 import classes from './styles.module.css';
 
 import { IoMdLogOut } from 'react-icons/io';
-import { menuData } from '@/shared/helpers';
+import { menuData, removeUserToken } from '@/shared/helpers';
 import { useUserContext } from '@/context/UserContext';
-import { user_role } from '@/shared/types';
+import { Action_Type, user_role } from '@/shared/types';
 import { Handshake, UsersFour, Wallet } from '@phosphor-icons/react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export function NavbarSimpleColored() {
-  const { user } = useUserContext()
+  const { user, userDispatch } = useUserContext()
   const [active, setActive] = useState('Billing');
   const [userMenuData, setMenuData] = useState(menuData)
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
 
 
   useEffect(() => {
@@ -33,7 +36,7 @@ export function NavbarSimpleColored() {
       position = 1;
       newItem = [
         {
-          link: "",
+          link: "/dashboard/registered-vendors",
           label: "Registered Vendors",
           icon: Handshake
         },
@@ -48,15 +51,20 @@ export function NavbarSimpleColored() {
     setMenuData(copyData)
   }, [user]);
 
+  useEffect(() => {
+    setActive(pathname)
+  }, [pathname])
+
   const links = userMenuData.map((item) => (
     <a
       className={classes.link}
-      data-active={item.label === active || undefined}
+      data-active={item.link === active || undefined}
       href={item.link}
       key={item.label}
       onClick={(event) => {
         event.preventDefault();
-        setActive(item.label);
+        navigate(item.link)
+        setActive(item.link);
       }}
     >
       {/* {item.icon} */}
@@ -65,6 +73,16 @@ export function NavbarSimpleColored() {
     </a>
   ));
 
+
+  const handleLogout = () => {
+    removeUserToken()
+    userDispatch({
+      type: Action_Type.LOGOUT_USER,
+      payload: null
+    })
+    navigate("/login")
+    // window.location.href = "/login"
+  }
   return (
     <>
       <nav className={classes.navbar}>
@@ -77,7 +95,10 @@ export function NavbarSimpleColored() {
           <a
             href="#"
             className={classes.link}
-            onClick={(event) => event.preventDefault()}>
+            onClick={(event) => {
+              event.preventDefault()
+              handleLogout()
+            }}>
             {/* <IconLogout className={classes.linkIcon} stroke={1.5} /> */}
             <IoMdLogOut className={classes.linkIcon} stroke={`1.5`} />
             <span>Logout</span>

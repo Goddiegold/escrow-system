@@ -9,10 +9,10 @@ export function DashboardHome() {
     const { user } = useUserContext()
     return (
         <>
-            <Grid>
+            {/* <Grid> */}
                 {user?.role === user_role.company && <CompanyDashboardHome />}
                 {user?.role === user_role.vendor && <VendorDashboardHome />}
-            </Grid>
+            {/* </Grid> */}
 
 
         </>

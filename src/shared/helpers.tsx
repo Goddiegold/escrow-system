@@ -26,9 +26,8 @@ export const FRONTEND_URL = "https://delegatecapturepro.pw"
 export const imageUrl = "https://delegatecapturepro.pw/img/profile.png"
 
 export const LCPD_ESCROW_SYS_USER_TOKEN = 'LCPD_ESCROW_SYS_USER_TOKEN';
-
+export const removeUserToken = () => localStorage.removeItem(LCPD_ESCROW_SYS_USER_TOKEN);
 export const userToken = () => localStorage.getItem(LCPD_ESCROW_SYS_USER_TOKEN)
-export const removeUserToken = () => localStorage.removeItem(LCPD_ESCROW_SYS_USER_TOKEN)
 
 export function decodeUserToken(token: string) {
     try {
@@ -86,17 +85,17 @@ export function getInitials(name: string) {
 
 export const menuData = [
     {
-        link: '',
+        link: '/dashboard',
         label: 'Dashboard',
         icon: SquaresFour
     },
     {
-        link: '',
+        link: '/dashboard/orders',
         label: 'Orders',
         icon: ShoppingCart
     },
     {
-        link: '',
+        link: '/dashboard/settings',
         label: 'Settings',
         icon: Gear
     },

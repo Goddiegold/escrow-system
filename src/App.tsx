@@ -6,6 +6,7 @@ import { useColorScheme, useHotkeys, useLocalStorage } from '@mantine/hooks';
 import '@mantine/core/styles.css';
 import "@mantine/notifications/styles.css";
 import '@mantine/dates/styles.css';
+// import '@mantine/charts/styles.css';
 
 export default function App() {
   const defaultColorScheme = useColorScheme();

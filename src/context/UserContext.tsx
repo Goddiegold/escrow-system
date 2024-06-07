@@ -16,7 +16,7 @@ const UserContext = createContext<UserContextType>({});
 const userReducer = (state: any, action: { payload?: any, type: Action_Type }) => {
     switch (action.type) {
         case Action_Type.USER_PROFILE:
-            localStorage.setItem(LCPD_ESCROW_SYS_USER_TOKEN, 
+            localStorage.setItem(LCPD_ESCROW_SYS_USER_TOKEN,
                 action.payload.token ?? state?.token)
             return {
                 ...state, ...action.payload,
@@ -24,10 +24,7 @@ const userReducer = (state: any, action: { payload?: any, type: Action_Type }) =
             };
         case Action_Type.LOGOUT_USER:
             removeUserToken()
-            return {
-                // user: null,
-                isLoggedIn: false
-            };
+            return null;
         default:
             return null
     }
@@ -48,7 +45,6 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
     const token = userToken()
 
-    // const isLoading = false;
     const { data, isLoading } = useQuery({
         queryKey: ["currentuserprofile"],
         queryFn: async () => client().get("/users/profile").then(res => {
@@ -57,9 +53,11 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
             userDispatch({
                 type: Action_Type.LOGOUT_USER,
             })
-            toast(err?.response?.data?.message).error()
+            if (!token) {
+                toast(err?.response?.data?.message).error()
+            }
         }),
-        enabled: !!token 
+        enabled: !!token
     })
 
     if (data && !user?.name) {

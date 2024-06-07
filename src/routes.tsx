@@ -9,6 +9,7 @@ import VerifyOtp from "./pages/VerifyOtp";
 import Settings from "./pages/dashboard/Settings";
 import RegisteredVendors from "./pages/dashboard/RegisteredVendors";
 import Orders from "./pages/dashboard/Orders";
+import AllVendorOrders from "./components/shared/dashboard/company/AllVendorOrders";
 
 const router = createBrowserRouter([
     {
@@ -33,8 +34,8 @@ const router = createBrowserRouter([
                 element: <Orders />,
             },
             {
-                path: "/dashboard/orders/:companyId/:tabValue",
-                element: <Orders />,
+                path: "/dashboard/vendor-orders/:vendorId",
+                element: <AllVendorOrders />
             },
             {
                 path: "/dashboard/settings",

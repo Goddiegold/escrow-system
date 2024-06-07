@@ -17,11 +17,9 @@ const useQueryURL = () => {
 
 const Orders = () => {
     const navigate = useNavigate();
-    const { tabValue } = useParams();
+    const { tabValue, vendorId } = useParams();
     const iconStyle = { width: rem(15), height: rem(15) };
-    const queryURL = useQueryURL();
-
-    const vendorId = queryURL.get("vendorId")
+    // const queryURL = useQueryURL();
 
     return (
         <Flex direction={"column"}>
@@ -29,9 +27,11 @@ const Orders = () => {
                 <BackBtn />
             </Flex>
             <Card shadow="sm" padding="sm" radius="md" withBorder mih={500} component={ScrollArea}>
-                <Tabs defaultValue="all"
+                <Tabs
+                    defaultValue="all"
                     value={tabValue}
-                    onChange={value => navigate(`/dashboard/orders/${value}`)}>
+                    onChange={value => navigate(!vendorId ? `/dashboard/orders/${value}` :
+                        `/dashboard/orders/${vendorId}/${value}`)}>
                     <Tabs.List>
                         <Tabs.Tab value="all"
                             leftSection={<ShoppingCart style={iconStyle} />}

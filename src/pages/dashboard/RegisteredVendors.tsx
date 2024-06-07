@@ -3,7 +3,7 @@ import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
 import { User, user_role } from "@/shared/types";
-import { Card, Flex, Skeleton, Table } from "@mantine/core";
+import { Card, Flex, Select, Skeleton, Table } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
@@ -32,8 +32,9 @@ const RegisteredVendors = () => {
 
     return (
         <Flex direction={"column"}>
-            <Flex justify={"flex-start"} my={10}>
+            <Flex my={10} align={"center"} justify={"space-between"}>
                 <BackBtn />
+              
             </Flex>
             <Card shadow="sm" padding="sm" radius="md" withBorder>
                 {isLoading && <Flex w={"100%"}>
@@ -60,7 +61,9 @@ const RegisteredVendors = () => {
                                         {item.email}
                                     </Table.Td>
                                     <Table.Td>
-                                        <Link to={`/dashboard/orders/${item?.companyId}/?vendorId=${item.id}`} className="text-color-1 underline">Orders</Link>
+                                        <Link to={`/dashboard/vendor-orders/${item.id}`}
+                                            state={{ prevPath: window.location.pathname }}
+                                            className="text-color-1 underline">Orders</Link>
                                     </Table.Td>
                                 </Table.Tr>
                             ))}
