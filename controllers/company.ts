@@ -1,18 +1,10 @@
 import {
-    comparePasswords,
     errorMessage,
-    filterUserProfile,
-    generateAuthToken,
-    generateHashedPassword,
-    generateOTL,
-    slugify,
-    uploadFile,
-    validateRequestBody
-} from '../shared/helpers';
-import { Router, Request, Response, query } from 'express';
-import { AuthenticatedRequest, IControllerBase, RequestType } from '../shared/types';
-import { requireRole, upload, userAuth } from '../shared/middlewares';
-import { PrismaClient, User, user_role } from '@prisma/client';
+    slugify} from '../shared/helpers';
+import { Router, Request, Response } from 'express';
+import { AuthenticatedRequest, IControllerBase } from '../shared/types';
+import { requireRole, userAuth } from '../shared/middlewares';
+import { PrismaClient, user_role } from '@prisma/client';
 
 
 export default class CompanyController implements IControllerBase {

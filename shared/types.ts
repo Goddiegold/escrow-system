@@ -1,4 +1,3 @@
-import { Company } from './../node_modules/.prisma/client/index.d';
 import { User } from "@prisma/client";
 import { Router, Request } from "express";
 

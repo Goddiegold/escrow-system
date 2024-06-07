@@ -4,16 +4,13 @@ import {
     filterUserProfile,
     generateAuthToken,
     generateHashedPassword,
-    generateOTL,
     generateOTP,
-    uploadFile,
     validateRequestBody
 } from '../shared/helpers';
-import { Router, Request, Response, query } from 'express';
+import { Router, Request, Response } from 'express';
 import { AuthenticatedRequest, IControllerBase, RequestType } from '../shared/types';
-import { requireRole, upload, userAuth } from '../shared/middlewares';
+import { userAuth } from '../shared/middlewares';
 import { PrismaClient, User, user_role } from '@prisma/client';
-import { compareAsc } from 'date-fns';
 
 
 export default class UserController implements IControllerBase {
