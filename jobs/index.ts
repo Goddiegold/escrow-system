@@ -1,6 +1,4 @@
-import { PrismaClient, payment_plan } from "@prisma/client";
-import cron from "node-cron";
-import { startOfDay } from "date-fns";
+import { PrismaClient } from "@prisma/client";
 
 export default function (prisma: PrismaClient) {
 
