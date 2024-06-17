@@ -1,32 +1,68 @@
 import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
-import { useQuery } from "@tanstack/react-query";
-import { Order as OrderType, user_role } from "@/shared/types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Order as OrderType, order_status, user_role } from "@/shared/types";
 import {
     Badge, Center, Flex, NumberFormatter,
+    Select,
     Skeleton, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
 import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 
 const SuccessfullPendingDeliveries = () => {
     const clientInstance = useClient()
     const { user } = useUserContext()
     const { companyId } = useParams()
+    const queryClient = useQueryClient()
+
+    const [orderStatus, setOrderStatus] = useState<order_status | "all" | null>(null)
 
     const { data, isLoading } = useQuery({
         queryKey: ["successfull-orders", companyId ?? user?.id],
-        queryFn: () => clientInstance().get(`/orders/company-orders/${companyId ?? user?.companyId}?status=delivered`)
-            .then(res => res.data?.result as OrderType[])
+        queryFn: () => clientInstance().get(
+            `/orders/company-orders/${companyId ?? user?.companyId}?status=delivered`)
+            .then(res => {
+                const orders = res.data?.result as OrderType[]
+                return {
+                    orders,
+                    result: orders
+                }
+            })
             .catch(err => {
                 toast(err?.response?.data?.message).error();
-                return [] as OrderType[]
+                return {
+                    result: [] as OrderType[],
+                    orders: [] as OrderType[]
+                }
             }),
     })
 
     const isNotVendor = (user?.role === user_role.admin) || (user?.role === user_role.company)
+
+
+    useEffect(() => {
+        queryClient.setQueryData(
+            ["successfull-orders", companyId ?? user?.id],
+            (data: {
+                result: OrderType[],
+                orders: OrderType[]
+            } | null) => {
+                if (!data) return;
+                const { orders } = data;
+                return {
+                    orders,
+                    result: !orderStatus ? orders : orderStatus === "all" ?
+                        orders : orders?.filter(item =>
+                            orderStatus === order_status.delivery_confirmed
+                                ? item.userReceived : !item.userReceived)
+                }
+            })
+
+    }, [orderStatus])
 
 
     return (
@@ -34,6 +70,18 @@ const SuccessfullPendingDeliveries = () => {
             {isLoading && <Flex w={"100%"}>
                 <Skeleton w={"100%"} h={50} />
             </Flex>}
+            <Flex justify={"flex-end"}>
+                <Select
+                    value={orderStatus}
+                    onChange={setOrderStatus}
+                    label="Delivery"
+                    w={200}
+                    data={[
+                        { label: "All", value: "all" },
+                        { label: "Delivery Confirmed", value: order_status.delivery_confirmed },
+                        { label: "Pending Confirmation", value: order_status.pending_confirmation }
+                    ]} />
+            </Flex>
             <Table
                 striped="even"
                 horizontalSpacing={"md"}
@@ -49,8 +97,8 @@ const SuccessfullPendingDeliveries = () => {
                     </Table.Tr>
                 </Table.Thead>}
                 <Table.Tbody>
-                    {data && data?.length > 0 ? <>
-                        {data.map(item => (
+                    {data?.result && data?.result.length > 0 ? <>
+                        {data.result.map(item => (
                             <Table.Tr>
                                 <Table.Td>
                                     <Flex direction={"column"}>
@@ -126,7 +174,7 @@ const SuccessfullPendingDeliveries = () => {
                     </>}
                 </Table.Tbody>
             </Table>
-            {data?.length === 0 &&
+            {data?.result?.length === 0 &&
                 <Center my={50}>
                     <Text>No data found</Text>
                 </Center>

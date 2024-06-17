@@ -44,7 +44,11 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
             if (!cancelOrder) {
                 queryClient.setQueryData(["successfull-orders", user?.id], (data: Order[] | null) => {
                     if (data) {
-                        return [{ ...item, order_status: orderStatus }, ...data]
+                        return [{
+                            ...item,
+                            order_status: orderStatus,
+                            vendorDelivered: true,
+                        }, ...data]
                     }
                 })
             }

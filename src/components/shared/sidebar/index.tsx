@@ -40,11 +40,11 @@ export function NavbarSimpleColored() {
           label: "Registered Vendors",
           icon: Handshake
         },
-        {
-          icon: UsersFour,
-          label: "Customers",
-          link: ""
-        }
+        // {
+        //   icon: UsersFour,
+        //   label: "Customers",
+        //   link: ""
+        // }
       ]
     }
     copyData.splice(position, 0, ...newItem)

@@ -44,7 +44,18 @@ const AllVendorOrders = () => {
                 const { orders } = data;
                 return {
                     orders,
-                    result: !selectedOrderStatus ? orders : selectedOrderStatus === "all" ? orders : orders?.filter(item => item.order_status === selectedOrderStatus)
+                    result: !selectedOrderStatus ? orders : selectedOrderStatus === "all" ?
+                        orders : orders?.filter(item => {
+                            if (selectedOrderStatus === order_status.delivery_confirmed) {
+                                return item.userReceived
+                            }
+
+                            if (selectedOrderStatus === order_status.pending_confirmation) {
+                                return !item.userReceived
+                            }
+                            return item.order_status === selectedOrderStatus
+                        }
+                        )
                 }
             }
         })
@@ -56,6 +67,7 @@ const AllVendorOrders = () => {
                 <Flex align={"center"} justify={"space-between"} my={10}>
                     <BackBtn />
                     <Select
+                        // size="xs"
                         value={selectedOrderStatus}
                         onChange={value => setSelectedOrderStatus(value)}
                         label="Order Status"
@@ -63,7 +75,9 @@ const AllVendorOrders = () => {
                             { label: "All", value: "all" },
                             { label: "Cancelled", value: order_status.cancelled },
                             { label: "Delivered", value: order_status.delivered },
-                            { label: "Pending", value: order_status.pending }
+                            { label: "Pending Delivery", value: order_status.pending },
+                            { label: "Delivery Confirmed", value: order_status.delivery_confirmed },
+                            { label: "Pending Confirmation", value: order_status.pending_confirmation }
                         ]} />
                 </Flex>
                 <Card shadow="sm" padding="sm" radius="md" withBorder mih={500} component={ScrollArea}>

@@ -24,7 +24,9 @@ export enum user_role {
 export enum order_status {
     pending = 'pending',
     delivered = 'delivered',
-    cancelled = 'cancelled'
+    cancelled = 'cancelled',
+    delivery_confirmed = "delivery_confirmed"
+    pending_confirmation = "pending_confirmation"
 }
 
 export enum Action_Type {

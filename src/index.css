@@ -789,11 +789,6 @@ video {
   line-height: 1;
 }
 
-.text-black{
-  --tw-text-opacity: 1;
-  color: rgb(0 0 0 / var(--tw-text-opacity));
-}
-
 .text-blue-400{
   --tw-text-opacity: 1;
   color: rgb(96 165 250 / var(--tw-text-opacity));
@@ -849,6 +844,10 @@ video {
 body,div,h1,h2,h3,h4,h5,h6,span,p,*{
   font-family: 'Switzer', sans-serif !important;
   /* font-family: 'Roboto', sans-serif !important; */
+}
+
+button{
+  outline: none !important;
 }
 
 .hover\:bg-color-1:hover{

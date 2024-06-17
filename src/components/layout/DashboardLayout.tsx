@@ -59,7 +59,7 @@ export default function DashboardLayout() {
                     <Flex direction={"column"} p={10}>
                         {location.pathname === "/dashboard" &&
                             <Flex direction={"row"} justify={"space-between"}>
-                                <Text my={10} fw={600} size='lg'>Hi there {user?.name} 👋, welcome 😁</Text>
+                                <Text my={10} fw={600} size='lg' c="dark">Hi there {user?.name} 👋, welcome 😁</Text>
                                 {isLoggedIn && user?.role === user_role.company ?
                                     <CopyButton value={`${window.origin}/register/${user?.company?.slug}`}>
                                         {({ copied, copy }) => (

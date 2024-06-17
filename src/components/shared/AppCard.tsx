@@ -21,11 +21,11 @@ const AppCard: React.FC<AppCardProps> = ({ ...props }) => {
             className={`rounded-xl bg-white py-6 px-7  
             font-3 flex flex-col justify-between`}>
             <Flex className="flex flex-row justify-between">
-                <Text size={'md'} className="" fw={600}>{title}</Text>
+                <Text size={'md'} className="" fw={600} c="dark">{title}</Text>
                 {/* {icon} */}
                 {props.icon && <CardIcon size={20} color="gray" />}
             </Flex>
-            <Text fw={600} size={"24px"} my={5}>{totalNumber}</Text>
+            <Text fw={600} size={"24px"} my={5} c="dark">{totalNumber}</Text>
             {/* <Link to={actionPath}
                 state={{ prevPath: window.location.pathname }}
                 className="cursor-pointer underline text-gray-300 text-xs text-muted-foreground">{action}</Link> */}
