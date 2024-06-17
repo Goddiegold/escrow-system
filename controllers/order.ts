@@ -184,7 +184,10 @@ export default class OrderController implements IControllerBase {
 
             await this.prisma.order.update({
                 where: { id: orderId },
-                data: { order_status: orderStatus }
+                data: {
+                    order_status: orderStatus,
+                    vendorDelivered: orderStatus === order_status.delivered ? true : false
+                }
             })
 
             return res.status(200).json({ message: "Update order status successfully!" })

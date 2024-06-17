@@ -85,9 +85,11 @@ model Order {
 }
 
 enum order_status {
-  pending   @map("pending")
-  delivered @map("delivered")
-  cancelled @map("cancelled")
+  pending              @map("pending")
+  delivered            @map("delivered")
+  cancelled            @map("cancelled")
+  delivery_confirmed   @map("delivery_confirmed")
+  pending_confirmation @map("pending_confirmation")
 }
 
 model Rating {
