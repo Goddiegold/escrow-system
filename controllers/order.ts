@@ -23,13 +23,15 @@ export default class OrderController implements IControllerBase {
             user_role.vendor])],
             this.getCompanyOrders)
 
+        this.router.get("/all", [userAuth, requireRole([user_role.admin])], this.getCompanyOrders)
+
         this.router.get("/vendor-orders/:vendorId",
             [userAuth, requireRole([user_role.company, user_role.admin])],
             this.retrieveVendorOrders)
 
         this.router.get("/:orderId", this.getOrder)
             .patch("/:orderId", [userAuth, requireRole([user_role.vendor,
-            user_role.company])], this.updateOrder)
+            user_role.company, user_role.admin])], this.updateOrder)
 
         this.router.post('/place-order',
             [userAuth, requireRole([user_role.company])],
@@ -114,6 +116,9 @@ export default class OrderController implements IControllerBase {
             }
 
             if (req.user?.role === user_role.company || req?.user?.role === user_role.vendor) {
+                //@ts-ignore
+                filter["companyId"] = companyId;
+
                 if (req?.user.companyId !== companyId) {
                     return res.status(403).json({ message: "Forbidden!" })
                 }
@@ -125,6 +130,8 @@ export default class OrderController implements IControllerBase {
                 }
             }
 
+
+
             const result = await this.prisma.order.findMany({
                 orderBy: { createdAt: "desc" },
                 include: {
@@ -132,7 +139,7 @@ export default class OrderController implements IControllerBase {
                     customer: { select: { id: true, name: true, email: true, } },
                     company: { select: { id: true, name: true, email: true } }
                 },
-                where: { companyId, ...filter, }
+                where: { ...filter }
             })
             return res.status(200).json({ result })
         } catch (error) {
@@ -156,7 +163,6 @@ export default class OrderController implements IControllerBase {
     updateOrder = async (req: AuthenticatedRequest, res: Response) => {
         try {
             const orderId = req?.params?.orderId;
-            // const data = {};
             const filter = {};
 
             if (req.user?.role === user_role.vendor) {
@@ -164,10 +170,15 @@ export default class OrderController implements IControllerBase {
                 filter["vendorId"] = req?.user?.id
             }
 
+            if ((req?.user?.role === user_role.vendor) ||
+                (req?.user?.role === user_role.company)) {
+                //@ts-ignore
+                filter["companyId"] = req?.user?.companyId
+            }
+
             const result = await this.prisma.order.findFirst({
                 where: {
                     id: orderId,
-                    companyId: req?.user?.companyId,
                     ...filter,
                 }
             })
@@ -186,7 +197,8 @@ export default class OrderController implements IControllerBase {
                 where: { id: orderId },
                 data: {
                     order_status: orderStatus,
-                    vendorDelivered: orderStatus === order_status.delivered ? true : false
+                    vendorDelivered: orderStatus === order_status.delivered ? true : false,
+                    vendorDeliveredOn: orderStatus === order_status.delivered ? new Date() : null
                 }
             })
 
