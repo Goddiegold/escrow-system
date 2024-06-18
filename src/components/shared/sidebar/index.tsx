@@ -5,14 +5,15 @@ import { IoMdLogOut } from 'react-icons/io';
 import { menuData, removeUserToken } from '@/shared/helpers';
 import { useUserContext } from '@/context/UserContext';
 import { Action_Type, user_role } from '@/shared/types';
-import { Handshake, UsersFour, Wallet } from '@phosphor-icons/react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { BuildingOffice, Handshake, Wallet } from '@phosphor-icons/react';
+import { useLocation} from 'react-router-dom';
+import useNavigation from '@/hooks/useNavigation';
 
 export function NavbarSimpleColored() {
   const { user, userDispatch } = useUserContext()
   const [active, setActive] = useState('Billing');
   const [userMenuData, setMenuData] = useState(menuData)
-  const navigate = useNavigate()
+  const navigate = useNavigation()
   const { pathname } = useLocation()
 
 
@@ -32,22 +33,31 @@ export function NavbarSimpleColored() {
       ]
     }
 
-    if (user?.role === user_role.company) {
+    if (user?.role === user_role.company || user?.role === user_role.admin) {
       position = 1;
       newItem = [
         {
           link: "/dashboard/registered-vendors",
-          label: "Registered Vendors",
+          label: "Vendors",
           icon: Handshake
         },
-        // {
-        //   icon: UsersFour,
-        //   label: "Customers",
-        //   link: ""
-        // }
       ]
+
+      if (user?.role === user_role.admin) {
+        newItem = [
+          {
+            link: "/dashboard/registered-companies",
+            label: "Companies",
+            icon: BuildingOffice
+          },
+          ...newItem
+        ]
+      }
     }
-    copyData.splice(position, 0, ...newItem)
+
+    if (newItem) {
+      copyData.splice(position, 0, ...newItem)
+    }
     setMenuData(copyData)
   }, [user]);
 

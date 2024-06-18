@@ -14,10 +14,14 @@ const AllOrders = () => {
     const clientInstance = useClient()
     const { user } = useUserContext()
     const { companyId } = useParams()
+    const isAdmin = user?.role === user_role.admin
 
     const { data, isLoading } = useQuery({
         queryKey: ["all-orders", companyId ?? user?.id],
-        queryFn: () => clientInstance().get(`/orders/company-orders/${companyId ?? user?.companyId}`)
+        queryFn: () => clientInstance().get(
+            !isAdmin ?
+                `/orders/company-orders/${companyId ?? user?.companyId}` : "/orders/all"
+        )
             .then(res => res.data?.result as OrderType[])
             .catch(err => {
                 toast(err?.response?.data?.message).error();
@@ -53,18 +57,12 @@ const AllOrders = () => {
                                     <Flex direction={"column"}>
                                         <Text fz="sm">{item?.customer?.name}</Text>
                                         <Text fz={"xs"} c={"dimmed"}>{item.customer?.email}</Text>
-                                        <Link
-                                            to={"#"}
-                                            className="text-color-1 text-xs underline">more orders</Link>
                                     </Flex>
                                 </Table.Td>
 
                                 {isNotVendor && <Table.Td>
                                     <Text fz="sm">{item?.vendor?.name}</Text>
                                     <Text fz={"xs"} c={"dimmed"}>{item?.vendor?.email}</Text>
-                                    <Link
-                                        to={"#"}
-                                        className="text-color-1 text-xs underline">more orders</Link>
                                 </Table.Td>}
 
                                 <Table.Td>

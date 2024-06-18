@@ -18,12 +18,14 @@ const SuccessfullPendingDeliveries = () => {
     const { user } = useUserContext()
     const { companyId } = useParams()
     const queryClient = useQueryClient()
+    const isAdmin = user?.role === user_role.admin
 
-    const [orderStatus, setOrderStatus] = useState<order_status | "all" | null>(null)
+    const [orderStatus, setOrderStatus] = useState<order_status | "all" | null>("all")
 
     const { data, isLoading } = useQuery({
         queryKey: ["successfull-orders", companyId ?? user?.id],
         queryFn: () => clientInstance().get(
+            isAdmin ? "/orders/all?status=delivered" :
             `/orders/company-orders/${companyId ?? user?.companyId}?status=delivered`)
             .then(res => {
                 const orders = res.data?.result as OrderType[]

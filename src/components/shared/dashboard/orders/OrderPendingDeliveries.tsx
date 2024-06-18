@@ -42,14 +42,16 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
                 })
 
             if (!cancelOrder) {
-                queryClient.setQueryData(["successfull-orders", user?.id], (data: Order[] | null) => {
-                    if (data) {
-                        return [{
-                            ...item,
-                            order_status: orderStatus,
-                            vendorDelivered: true,
-                        }, ...data]
+                queryClient.setQueryData(["successfull-orders", user?.id], (data: {
+                    result: OrderType[],
+                    orders: OrderType[]
+                } | null) => {
+                    if (!data) return;
+                    return {
+                        orders: [{ ...item, order_status: orderStatus, vendorDelivered: true}, ...data.orders],
+                        result: data?.result,
                     }
+
                 })
             }
 
@@ -78,17 +80,17 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
                 <Flex direction={"column"}>
                     <Text fz="sm">{item?.customer?.name}</Text>
                     <Text fz={"xs"} c={"dimmed"}>{item.customer?.email}</Text>
-                    <Link
+                    {/* <Link
                         to={"#"}
-                        className="text-color-1 text-xs underline">more orders</Link>
+                        className="text-color-1 text-xs underline">more orders</Link> */}
                 </Flex>
             </Table.Td>
             {isNotVendor && <Table.Td>
                 <Text fz="sm">{item?.vendor?.name}</Text>
                 <Text fz={"xs"} c={"dimmed"}>{item?.vendor?.email}</Text>
-                <Link
+                {/* <Link
                     to={"#"}
-                    className="text-color-1 text-xs underline">more orders</Link>
+                    className="text-color-1 text-xs underline">more orders</Link> */}
             </Table.Td>}
 
 
@@ -145,10 +147,14 @@ const OrderPendingDeliveries = () => {
     const clientInstance = useClient()
     const { user } = useUserContext()
     const { companyId } = useParams()
+    const isAdmin = user?.role === user_role.admin
 
     const { data, isLoading } = useQuery({
         queryKey: ["pending-orders", companyId ?? user?.id],
-        queryFn: () => clientInstance().get(`/orders/company-orders/${companyId ?? user?.companyId}?status=pending`)
+        queryFn: () => clientInstance().get(
+            isAdmin ? "/orders/all?status=pending" :
+                `/orders/company-orders/${companyId ?? user?.companyId}?status=pending`
+        )
             .then(res => res.data?.result as OrderType[])
             .catch(err => {
                 toast(err?.response?.data?.message).error();
