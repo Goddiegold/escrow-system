@@ -1,6 +1,6 @@
 import { notifications } from "@mantine/notifications";
 import { jwtDecode } from "jwt-decode";
-import { Gear, Handshake, HouseLine, ShoppingCart, SquaresFour, User as UserIcon, Wallet } from '@phosphor-icons/react';
+import { Gear, ShoppingCart, SquaresFour } from '@phosphor-icons/react';
 
 
 export const toast = (message: string, title?: string) => {

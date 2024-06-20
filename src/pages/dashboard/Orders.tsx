@@ -1,7 +1,7 @@
 import BackBtn from "@/components/shared/BackBtn";
-import AllOrders from "@/components/shared/dashboard/orders/AllOrders";
-import OrderPendingDeliveries from "@/components/shared/dashboard/orders/OrderPendingDeliveries";
-import OrderSuccessfullDeliveries from "@/components/shared/dashboard/orders/OrderSuccessfullDeliveries";
+import AllOrders from "@/components/dashboard/orders/AllOrders";
+import OrderPendingDeliveries from "@/components/dashboard/orders/OrderPendingDeliveries";
+import OrderSuccessfullDeliveries from "@/components/dashboard/orders/OrderSuccessfullDeliveries";
 
 
 import { Card, Flex, ScrollArea, Tabs, rem } from "@mantine/core";
@@ -26,7 +26,8 @@ const Orders = () => {
             <Flex justify={"flex-start"} my={10}>
                 <BackBtn />
             </Flex>
-            <Card shadow="sm" padding="sm" radius="md" withBorder mih={500} component={ScrollArea}>
+            <Card shadow="sm" padding="sm" radius="md"
+                withBorder mih={500} component={ScrollArea}>
                 <Tabs
                     defaultValue="all"
                     value={tabValue}

@@ -560,6 +560,16 @@ video {
   visibility: visible;
 }
 
+.\!mx-auto{
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.my-\[10px\]{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .my-auto{
   margin-top: auto;
   margin-bottom: auto;
@@ -583,6 +593,10 @@ video {
 
 .mt-5{
   margin-top: 1.25rem;
+}
+
+.mt-\[10px\]{
+  margin-top: 10px;
 }
 
 .block{
@@ -867,6 +881,10 @@ button{
   .sm\:w-\[500px\]{
     width: 500px;
   }
+
+  .sm\:min-w-\[250px\]{
+    min-width: 250px;
+  }
 }
 
 @media (min-width: 768px){
@@ -888,5 +906,11 @@ button{
 
   .md\:w-\[50\%\]{
     width: 50%;
+  }
+}
+
+@media (min-width: 1024px){
+  .lg\:mt-0{
+    margin-top: 0px;
   }
 }

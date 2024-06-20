@@ -70,7 +70,8 @@ const DashboardHome = () => {
     return (
         <Flex direction={"column"} w={"100%"}>
             <Grid>
-                {isLoading ? <>{
+                {
+                isLoading ? <>{
                     Array(3).fill(null).map((item, key) => (
                         <Grid.Col
                             key={key}

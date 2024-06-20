@@ -1,4 +1,4 @@
-import { NavbarSimpleColored } from '@/components/shared/sidebar';
+import { NavbarSimpleColored } from '@/components/sidebar';
 import { AppShell, Button, CopyButton, Flex, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';

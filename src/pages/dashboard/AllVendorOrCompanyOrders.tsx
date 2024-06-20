@@ -9,19 +9,25 @@ import {
     Skeleton, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
-import { Link, useParams } from "react-router-dom";
-import BackBtn from "../../BackBtn";
+import { useParams } from "react-router-dom";
+import BackBtn from "../../components/shared/BackBtn";
 import { useEffect, useState } from "react";
+import usePagination from "@/hooks/usePagination";
 
 const AllVendorOrders = () => {
     const clientInstance = useClient()
-    const { vendorId } = useParams()
+    const { vendorId, companyId } = useParams()
     const [selectedOrderStatus, setSelectedOrderStatus] = useState<order_status | "all">("all")
     const queryClient = useQueryClient()
 
+    const queryKey = vendorId ? ["vendor-orders", vendorId] : ["company_orders", companyId]
+    console.log("vendorId", vendorId)
+    console.log("companyId", companyId)
     const { data, isLoading } = useQuery({
-        queryKey: ["vendor-orders", vendorId],
-        queryFn: () => clientInstance().get(`/orders/vendor-orders/${vendorId}`)
+        queryKey,
+        queryFn: () => clientInstance().get(
+            vendorId ? `/orders/vendor-orders/${vendorId}` :
+                `/orders/company-orders/${companyId}`)
             .then(res => {
                 const orders = res.data?.result as OrderType[]
                 return {
@@ -39,27 +45,30 @@ const AllVendorOrders = () => {
     })
 
     useEffect(() => {
-        queryClient.setQueryData(["vendor-orders", vendorId], (data: { orders: OrderType[], result: OrderType[] } | null) => {
-            if (data) {
-                const { orders } = data;
-                return {
-                    orders,
-                    result: !selectedOrderStatus ? orders : selectedOrderStatus === "all" ?
-                        orders : orders?.filter(item => {
-                            if (selectedOrderStatus === order_status.delivery_confirmed) {
-                                return item.userReceived
-                            }
+        queryClient.setQueryData(queryKey,
+            (data: { orders: OrderType[], result: OrderType[] } | null) => {
+                if (data) {
+                    const { orders } = data;
+                    return {
+                        orders,
+                        result: !selectedOrderStatus ? orders : selectedOrderStatus === "all" ?
+                            orders : orders?.filter(item => {
+                                if (selectedOrderStatus === order_status.delivery_confirmed) {
+                                    return item.userReceived
+                                }
 
-                            if (selectedOrderStatus === order_status.pending_confirmation) {
-                                return !item.userReceived
+                                if (selectedOrderStatus === order_status.pending_confirmation) {
+                                    return (!item.userReceived && item.order_status === order_status.delivered)
+                                }
+                                return item.order_status === selectedOrderStatus
                             }
-                            return item.order_status === selectedOrderStatus
-                        }
-                        )
+                            )
+                    }
                 }
-            }
-        })
+            })
     }, [selectedOrderStatus])
+
+    const { PaginationBtn, data: paginatedData } = usePagination(data?.result ?? [])
 
     return (
         <>
@@ -69,7 +78,7 @@ const AllVendorOrders = () => {
                     <Select
                         // size="xs"
                         value={selectedOrderStatus}
-                        onChange={value => setSelectedOrderStatus(value)}
+                        onChange={setSelectedOrderStatus}
                         label="Order Status"
                         data={[
                             { label: "All", value: "all" },
@@ -99,15 +108,12 @@ const AllVendorOrders = () => {
                         </Table.Thead>}
                         <Table.Tbody>
                             {data?.result && data?.result?.length > 0 ? <>
-                                {data.result.map(item => (
+                                {paginatedData.map(item => (
                                     <Table.Tr>
                                         <Table.Td>
                                             <Flex direction={"column"}>
                                                 <Text fz="sm">{item?.customer?.name}</Text>
                                                 <Text fz={"xs"} c={"dimmed"}>{item.customer?.email}</Text>
-                                                <Link
-                                                    to={"#"}
-                                                    className="text-color-1 text-xs underline">more orders</Link>
                                             </Flex>
                                         </Table.Td>
 
@@ -167,11 +173,14 @@ const AllVendorOrders = () => {
                             </>}
                         </Table.Tbody>
                     </Table>
-                    {data?.result?.length === 0 &&
-                        <Center my={50}>
+                    <Center my={50}>
+                        {data?.result?.length === 0 ?
                             <Text>No data found</Text>
-                        </Center>
-                    }
+                            :
+                            <PaginationBtn />
+                        }
+
+                    </Center>
                 </Card>
             </Flex>
         </>
