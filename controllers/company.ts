@@ -1,6 +1,7 @@
 import {
     errorMessage,
-    slugify} from '../shared/helpers';
+    slugify
+} from '../shared/helpers';
 import { Router, Request, Response } from 'express';
 import { AuthenticatedRequest, IControllerBase } from '../shared/types';
 import { requireRole, userAuth } from '../shared/middlewares';
@@ -20,19 +21,20 @@ export default class CompanyController implements IControllerBase {
 
         this.router.get("/get-users",
             [userAuth, requireRole([user_role.company, user_role.admin])], this.getUsers)
-        // this.router.get("/all-customers",)
         this.router.post("/register", [userAuth, requireRole([user_role.company])], this.addCompanyInfo)
-        this.router.get("/:companySlug", this.getCompanyInfo)
+        this.router.get("company-info/:companySlug", this.getCompanyInfo)
+        this.router.get("/all-companies", [userAuth, requireRole([user_role.admin])], this.getCompanies)
     }
 
 
     getUsers = async (req: AuthenticatedRequest, res: Response) => {
         try {
             const userRole = req?.query?.role as user_role;
+            const companyId = req?.query?.companyId as string;
             const filter = {};
-            if (req?.user?.role === user_role.vendor) {
+            if (companyId || req?.user?.companyId) {
                 //@ts-ignore
-                filter["companyId"] = req?.user?.companyId
+                filter["companyId"] = companyId ?? req?.user?.companyId
             }
             const result = await this.prisma.user.findMany({
                 select: { id: true, email: true, name: true, createdAt: true, companyId: true },
@@ -77,8 +79,21 @@ export default class CompanyController implements IControllerBase {
                 select: { id: true, name: true },
                 where: { slug: req?.params?.companySlug }
             })
-            if (!companyExist) return res.status(404).json({ message: "Company doesn't exist!" })
+            if (!companyExist) return res.status(404).json({
+                message: "Company doesn't exist!"
+            })
             return res.status(200).json({ result: companyExist })
+        } catch (error) {
+            return res.status(500).json(errorMessage(error))
+        }
+    }
+
+    getCompanies = async (req: Request, res: Response) => {
+        try {
+            const result = await this.prisma.company.findMany({
+                orderBy: { createdAt: "desc" }
+            })
+            return res.status(200).json({ result })
         } catch (error) {
             return res.status(500).json(errorMessage(error))
         }
