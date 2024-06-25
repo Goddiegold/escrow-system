@@ -12,7 +12,7 @@ export type Company = {
     id: string,
     name: string,
     slug: string,
-    createdAt?:Date
+    createdAt?: Date
 }
 
 export enum user_role {
@@ -60,4 +60,5 @@ export type Order = {
     createdAt: Date,
     updatedAt: Date,
     order_status: order_status
+    company: Company | null
 }

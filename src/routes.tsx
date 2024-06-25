@@ -11,6 +11,7 @@ import RegisteredVendors from "./pages/dashboard/RegisteredVendors";
 import Orders from "./pages/dashboard/Orders";
 import AllVendorOrCompanyOrders from "./pages/dashboard/AllVendorOrCompanyOrders";
 import RegisteredCompanies from "./pages/dashboard/RegisteredCompanies";
+import ConfirmDelivery from "./pages/ConfirmDelivery";
 
 const router = createBrowserRouter([
     {
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard/registered-companies",
-                element: <RegisteredCompanies/>
+                element: <RegisteredCompanies />
             },
             {
                 path: "/dashboard/orders",
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
             {
                 path: "/verify-otp",
                 element: <VerifyOtp />
+            },
+            {
+                path: "confirm-delivery/:orderId",
+                element: <ConfirmDelivery />
             }
         ]
     },
