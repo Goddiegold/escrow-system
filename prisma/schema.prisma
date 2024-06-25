@@ -82,6 +82,8 @@ model Order {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  orderRef String?
 }
 
 enum order_status {

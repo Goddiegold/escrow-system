@@ -37,7 +37,7 @@ export default class OrderController implements IControllerBase {
             [userAuth, requireRole([user_role.company])],
             this.placeOrder)
 
-        // this.router.patch()
+        this.router.get("/confirm-order/:orderId", this.confirmOrder)
     }
 
 
@@ -150,11 +150,14 @@ export default class OrderController implements IControllerBase {
     getOrder = async (req: AuthenticatedRequest, res: Response) => {
         try {
             const orderId = req?.params?.orderId
-            const result = await this.prisma.order.findFirst({ where: { id: orderId } })
+            const result = await this.prisma.order.findFirst({
+                include: { company: { select: { name: true } } },
+                where: { id: orderId }
+            })
             if (!result) {
                 return res.status(404).json({ message: "Order Not Found!" })
             }
-            return res.status(201).json({ result })
+            return res.status(200).json({ result })
         } catch (error) {
             return res.status(500).json(errorMessage(error))
         }
@@ -249,6 +252,25 @@ export default class OrderController implements IControllerBase {
                 where: { vendorId, ...filter }
             })
             return res.status(200).json({ result })
+        } catch (error) {
+            return res.status(500).json(errorMessage(error))
+        }
+    }
+
+    confirmOrder = async (req: AuthenticatedRequest, res: Response) => {
+        try {
+            const orderId = req.params?.orderId
+            const order = await this.prisma.order.findFirst({ where: { id: orderId } })
+            if (!order) {
+                return res.status(404).json({ message: "Order was not found!" })
+            }
+            await this.prisma.order.update({
+                where: { id: orderId },
+                data: { userReceived: true, userReceivedOn: new Date() }
+            })
+
+            //credit vendor
+            return res.status(200).json({ message: "Order has being confirmed successfully!" })
         } catch (error) {
             return res.status(500).json(errorMessage(error))
         }
