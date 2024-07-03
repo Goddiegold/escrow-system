@@ -22,7 +22,7 @@ export default class CompanyController implements IControllerBase {
         this.router.get("/get-users",
             [userAuth, requireRole([user_role.company, user_role.admin])], this.getUsers)
         this.router.post("/register", [userAuth, requireRole([user_role.company])], this.addCompanyInfo)
-        this.router.get("company-info/:companySlug", this.getCompanyInfo)
+        this.router.get("/company-info/:companySlug", this.getCompanyInfo)
         this.router.get("/all-companies", [userAuth, requireRole([user_role.admin])], this.getCompanies)
     }
 

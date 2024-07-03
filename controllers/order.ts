@@ -5,7 +5,8 @@ import {
 import { Router, Response } from 'express';
 import { AuthenticatedRequest, IControllerBase, RequestType } from '../shared/types';
 import { requireRole, userAuth } from '../shared/middlewares';
-import { PrismaClient, User, order_status, user_role } from '@prisma/client';
+import { PrismaClient, User, notification_type, order_status, user_role } from '@prisma/client';
+import mailService from '../shared/mailService';
 
 export default class OrderController implements IControllerBase {
 
@@ -92,6 +93,22 @@ export default class OrderController implements IControllerBase {
                 }
             })
 
+            await this.prisma.notification.create({
+                data: {
+                    vendorId: vendor.id,
+                    companyId: req?.user?.companyId,
+                    type: notification_type.customer_placed_order,
+                    orderId: order.id,
+                }
+            })
+
+            mailService({
+                subject: "An order has been placed",
+                email:vendor.email,
+                template: "forgotPassword",
+                name: vendor.name,
+                url: `${process.env.FRONTEN_URL}/login?redirect=/dashboard/orders/pending-deliveries`
+            })
             return res.status(201).json({ result: order })
 
         } catch (error) {
@@ -205,6 +222,21 @@ export default class OrderController implements IControllerBase {
                 }
             })
 
+            const orderIsCancelled = orderStatus === order_status.cancelled;
+            const orderIsDelivered = orderStatus === order_status.delivered;
+
+            if (orderIsCancelled || orderIsDelivered) {
+                await this.prisma.notification.create({
+                    data: {
+                        companyId: result.companyId,
+                        vendorId: result.companyId,
+                        orderId,
+                        type: orderIsCancelled ? notification_type.order_cancelled :
+                            notification_type.order_delivered,
+                        message: `Updated by ${req?.user?.role}`
+                    }
+                })
+            }
             return res.status(200).json({ message: "Update order status successfully!" })
         } catch (error) {
             return res.status(500).json(errorMessage(error))
@@ -266,11 +298,25 @@ export default class OrderController implements IControllerBase {
             }
             await this.prisma.order.update({
                 where: { id: orderId },
-                data: { userReceived: true, userReceivedOn: new Date() }
+                data: {
+                    userReceived: true,
+                    userReceivedOn: new Date()
+                }
+            })
+
+            await this.prisma.notification.create({
+                data: {
+                    orderId,
+                    vendorId: order.vendorId,
+                    companyId: order?.companyId,
+                    type: notification_type.delivery_confirmed
+                }
             })
 
             //credit vendor
-            return res.status(200).json({ message: "Order has being confirmed successfully!" })
+            return res.status(200).json({
+                message: "Order has being confirmed successfully!"
+            })
         } catch (error) {
             return res.status(500).json(errorMessage(error))
         }

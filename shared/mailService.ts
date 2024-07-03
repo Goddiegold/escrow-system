@@ -1,50 +1,17 @@
 import nodemailer from "nodemailer";
-import mg from "nodemailer-mailgun-transport";
 import handlebars from "handlebars";
 import fs from "fs/promises";
 import path from "path";
-import { RequestType } from "./types";
-import moment from "moment";
 
-
-function convertDate(date: string): string {
-    return new Intl.DateTimeFormat('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    }).format(new Date(date))
-}
 
 async function sendEmail(mailData: any) {
     try {
-        const FRONTEND_URL = process.env.FRONTEND_URL;
-
-        const getContent = () => {
-            //@ts-ignore
-            return {
-                [RequestType.PAYMENT_REMINDER]: {
-                    ...mailData,
-                    subject: `Invoice for ${mailData.reason}`,
-                    template: "paymentReminder",
-                    url: `http://localhost:5173/payment/${mailData.id}`,
-                    issueDate: moment(mailData.issueDate).format("DD/MM/YYYY"),
-                    dueDate: moment(mailData.dueDate).format("DD/MM/YYYY"),
-                    amount: `${mailData?.amount - mailData?.amountPaid}`,
-                },
-                [RequestType.FORGOT_PASSWORD]:{
-                    name: mailData.name,
-                    subject:"A request to reset your password has been made!",
-                    url: `${FRONTEND_URL}/reset-password/${mailData.otl}`,
-                    template:"forgotPassword"
-                },
-            }[mailData.requestType];
-        };
-
-        const content = getContent()
+        const content = { ...mailData }
         console.log("content", content);
 
 
-        const emailTemplateSource = await fs.readFile(path.join(__dirname, `../shared/templates/${content?.template}.hbs`), "utf8");
+        const emailTemplateSource = await fs.readFile(
+            path.join(__dirname, `../shared/templates/${content?.template}.hbs`), "utf8");
 
         const mailgunAuth = {
             auth: {
@@ -53,7 +20,18 @@ async function sendEmail(mailData: any) {
             },
         };
 
-        const smtpTransport = nodemailer.createTransport(mg(mailgunAuth));
+        // const smtpTransport = nodemailer.createTransport(mg(mailgunAuth));
+        const smtpTransport = nodemailer.createTransport({
+            //@ts-ignore
+            host: process.env.MAIL_HOST as string,
+            port: process.env.MAIL_PORT,
+            secure: false,
+            auth: {
+                user: process.env.MAIL_AUTH_USER,
+                pass: process.env.MAIL_AUTH_PASSWORD
+            }
+
+        });
         const template = handlebars.compile(emailTemplateSource);
 
         const htmlToSend = template({
@@ -64,7 +42,7 @@ async function sendEmail(mailData: any) {
 
 
         const mailOptions = {
-            from: `ShieldInvoice <invite@delegatecapturepro.pw>`,
+            from: `Escrow <${process.env.MAIL_DOMAIN}>`,
             to: mailData?.email,
             subject: content?.subject,
             html: htmlToSend,

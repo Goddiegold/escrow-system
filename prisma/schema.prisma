@@ -46,8 +46,11 @@ model User {
   company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
   companyId String?  @db.ObjectId
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  // customerNotifications Notification[] @relation("customerNotifications")
+  vendorNotifications  Notification[] @relation("vendorNotifications")
+  companyNotifications Notification[] @relation("companyNotifications")
 }
 
 model Order {
@@ -83,7 +86,8 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  orderRef String?
+  orderRef      String?
+  notifications Notification[]
 }
 
 enum order_status {
@@ -113,4 +117,23 @@ model Rating {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  type      notification_type
+  order     Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderId   String?           @db.ObjectId
+  vendor    User?             @relation("vendorNotifications", fields: [vendorId], references: [id], onDelete: SetNull)
+  vendorId  String?           @db.ObjectId
+  company   User?             @relation("companyNotifications", fields: [vendorId], references: [id], onDelete: SetNull)
+  companyId String?           @db.ObjectId
+  message   String?
+}
+
+enum notification_type {
+  customer_placed_order @map("customer_placed_order")
+  order_cancelled       @map("order_cancelled")
+  order_delivered       @map("order_delivered")
+  delivery_confirmed       @map("delivery_confirmed")
 }
