@@ -14,6 +14,7 @@ import { toast } from "@/shared/helpers";
 import { Action_Type, Company, User } from "@/shared/types";
 import { useUserContext } from "@/context/UserContext";
 import { useQuery } from "@tanstack/react-query";
+import AppLoader from "@/components/shared/AppLoader";
 
 const Login = () => {
     const [loading, setLoading] = useState(false)
@@ -24,7 +25,7 @@ const Login = () => {
 
     const { data, isLoading } = useQuery({
         queryKey: ["company-info", companySlug],
-        queryFn: () => clientInstance().get(`/companies/${companySlug}`)
+        queryFn: () => clientInstance().get(`/companies/company-info/${companySlug}`)
             .then(res => res.data?.result as Company)
             .catch(err => {
                 toast(err?.response?.data?.message).error()
@@ -86,13 +87,17 @@ const Login = () => {
     })
 
     const { values, touched, handleChange, handleSubmit, errors, handleBlur } = formik;
+
+    if (isLoading) {
+        return <AppLoader />
+    }
     return (
         <BackgroundLayout
             bottomContent={<>
                 <Text style={{ textAlign: "center" }} size="sm">
                     Don't have an account yet?{" "}
                     <Link
-                        to={"/register"}
+                        to={!companySlug ? "/register" : `/register/${companySlug}`}
                         className="font-bold text-blue-400 no-underline"
                     >
                         Sign Up
@@ -102,11 +107,6 @@ const Login = () => {
             title={!companySlug ? "Login to your account" :
                 `Login to your escrow account with ${data?.name ?? "company"}`}
         >
-            <LoadingOverlay
-                visible={loading || isLoading}
-                zIndex={1000}
-                loaderProps={{ type: "dots" }}
-                overlayProps={{ radius: "sm", blur: 2 }} />
             <form method="POST" onSubmit={handleSubmit}>
                 <TextInput
                     onBlur={handleBlur("email")}
@@ -124,7 +124,10 @@ const Login = () => {
                     error={errors.password && touched?.password ? errors.password : null}
                     label="Password"
                     my={10} />
-                <Button type="submit" my={10}>Login</Button>
+                <Button
+                    loading={loading}
+                    type="submit"
+                    my={10}>Login</Button>
             </form>
         </BackgroundLayout>
     );

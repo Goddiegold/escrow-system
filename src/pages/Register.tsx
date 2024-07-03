@@ -1,5 +1,5 @@
 import BackgroundLayout from "@/components/layout/BackgroundLayout";
-import { Button, LoadingOverlay, PasswordInput, TextInput, Text }
+import { Button, LoadingOverlay, PasswordInput, TextInput, Text, Flex }
     from "@mantine/core";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -11,6 +11,7 @@ import { At, User as UserIcon, Lock } from "@phosphor-icons/react"
 import { useUserContext } from "@/context/UserContext";
 import { Action_Type, Company, User } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
+import AppLoader from "@/components/shared/AppLoader";
 
 const Register = () => {
     const [loading, setLoading] = useState(false)
@@ -21,7 +22,7 @@ const Register = () => {
 
     const { data, isLoading } = useQuery({
         queryKey: ["company-info", companySlug],
-        queryFn: () => clientInstance().get(`/companies/${companySlug}`)
+        queryFn: () => clientInstance().get(`/companies/company-info/${companySlug}`)
             .then(res => res.data?.result as Company)
             .catch(err => {
                 toast(err?.response?.data?.message).error()
@@ -35,7 +36,7 @@ const Register = () => {
         try {
             setLoading(true)
             const res = await client().post(!companySlug ? `/users/register` :
-             `/users/register?companySlug=${companySlug}`, { ...user })
+                `/users/register?companySlug=${companySlug}`, { ...user })
             setLoading(false)
             const token = res.headers["authorization"];
             toast('Logged In Successfully!').success()
@@ -73,23 +74,28 @@ const Register = () => {
 
     const { values, touched, handleChange, handleSubmit, errors, handleBlur } = formik;
 
+
+    if (isLoading) {
+        return <AppLoader />
+    }
     return (
         <BackgroundLayout
             bottomContent={<>
-                <Text >Already have an account ?
+                <Text style={{ textAlign: "center" }} size="sm">Already have an account ?
                     {" "}
-                    <Link to={'/login'} className="font-bold text-blue-400 no-underline">
+                    <Link to={!companySlug ? '/login' : `/login/jumia`}
+                        className="font-bold text-blue-400 no-underline">
                         Login
                     </Link>
                 </Text>
             </>}
             title={!companySlug ? "Create a business account" : `Create an escrow account under ${data?.name ?? "company"}`}>
 
-            <LoadingOverlay
+            {/* <LoadingOverlay
                 visible={loading || isLoading}
                 zIndex={1000}
                 loaderProps={{ type: "dots" }}
-                overlayProps={{ radius: "sm", blur: 2 }} />
+                overlayProps={{ radius: "sm", blur: 2 }} /> */}
             <form onSubmit={handleSubmit}>
                 <TextInput
                     label="Name"
@@ -117,7 +123,10 @@ const Register = () => {
                     error={errors.password && touched.password ? errors.password : null}
                     label="Password"
                     my={10} />
-                <Button my={10} type="submit">Register</Button>
+                <Button
+                    loading={loading}
+                    my={10}
+                    type="submit">Register</Button>
             </form>
         </BackgroundLayout>
     );

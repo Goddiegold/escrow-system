@@ -1,13 +1,16 @@
+import Personalization from "@/components/dashboard/settings/Personalization";
 import ProfileSettings from "@/components/dashboard/settings/ProfileSettings";
 import Security from "@/components/dashboard/settings/Security";
 import BackBtn from "@/components/shared/BackBtn";
+import { useUserContext } from "@/context/UserContext";
 import { Card, Flex, Tabs } from "@mantine/core";
-import { LockKey, UserCircle } from "@phosphor-icons/react";
+import { LockKey, PaintBrush, UserCircle } from "@phosphor-icons/react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Settings = () => {
     const navigate = useNavigate();
     const { tabValue } = useParams();
+    const { user } = useUserContext()
     return (
         <>
             <Flex justify={"flex-start"} my={10}>
@@ -26,28 +29,22 @@ const Settings = () => {
                         <Tabs.Tab
                             leftSection={<LockKey size={20} />}
                             value="security">Security</Tabs.Tab>
-                        <Tabs.Tab value="subscripitons">Subscripiton</Tabs.Tab>
+                        <Tabs.Tab
+                            value="personalization"
+                            leftSection={<PaintBrush size={20} />}>
+                            Personalization
+                        </Tabs.Tab>
                     </Tabs.List>
 
                     <Tabs.Panel value="profile" pt="xs">
-                        {/* <ProfileInformation /> */}
                         <ProfileSettings />
                     </Tabs.Panel>
 
                     <Tabs.Panel value="security" pt="xs">
                         <Security />
                     </Tabs.Panel>
-
-                    <Tabs.Panel value="subscripitons" pt="xs">
-                        {/* <SubscriptionManagement /> */}
-                    </Tabs.Panel>
-
-                    <Tabs.Panel value="sub_and_acct_mgt" pt="xs">
-                        {/* <SubAndAcctMgt /> */}
-                    </Tabs.Panel>
-
-                    <Tabs.Panel value="transactions" pt="xs">
-                        {/* <TransactionHistory userId={user?.id} /> */}
+                    <Tabs.Panel value="personalization" pt="xs">
+                        <Personalization />
                     </Tabs.Panel>
                 </Tabs>
             </Card>

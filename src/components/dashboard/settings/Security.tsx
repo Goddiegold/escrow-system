@@ -3,8 +3,8 @@ import { LockSimple } from "@phosphor-icons/react";
 
 const SecuritySettings = () => {
     return (
-        <Flex direction={"column"}>
-            <form className="w-[80%] sm:w-[500px]">
+        <Flex direction={"column"} maw={500}>
+            <form >
                 <PasswordInput
                     leftSection={<LockSimple size={20} />}
                     my={10}

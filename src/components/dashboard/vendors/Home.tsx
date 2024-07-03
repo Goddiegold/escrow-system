@@ -41,7 +41,7 @@ const DashboardHome = () => {
 
     return (
         <>
-            <>
+            <Grid>
                 {isLoading ? <>{
                     Array(3).fill(null).map((item, key) => (
                         <Grid.Col
@@ -69,7 +69,7 @@ const DashboardHome = () => {
                         ))
                     }
                 </>}
-            </>
+            </Grid>
         </>
     );
 }
