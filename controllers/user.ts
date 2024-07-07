@@ -10,8 +10,8 @@ import {
 } from '../shared/helpers';
 import { Router, Request, Response } from 'express';
 import { AuthenticatedRequest, IControllerBase, RequestType } from '../shared/types';
-import { userAuth } from '../shared/middlewares';
-import { PrismaClient, User, user_role } from '@prisma/client';
+import { requireRole, userAuth } from '../shared/middlewares';
+import { PrismaClient, User, user_role, Notification } from '@prisma/client';
 import mailService from '../shared/mailService';
 
 
@@ -30,9 +30,9 @@ export default class UserController implements IControllerBase {
         this.router.get('/profile', userAuth, this.getProfile)
         this.router.post("/reset-password-1", this.resetPassword1)
         this.router.put("/reset-password-3/:otl", this.resetPassword3)
-
         this.router.put("/update-profile", userAuth, this.updateProfile)
         this.router.put("/update-password", userAuth, this.updatePassword)
+        this.router.get("/notifications", [userAuth, requireRole([user_role.company, user_role.vendor])], this.getNotifications)
     }
 
     login = async (req: Request, res: Response) => {
@@ -211,10 +211,10 @@ export default class UserController implements IControllerBase {
             const currentUser = req?.user
             const { oldPassword, newPassword } = req.body;
             const userExists = await this.prisma.user.findFirst({
-                where: { id: currentUser?.id},
+                where: { id: currentUser?.id },
                 select: {
                     password: true
-                }, 
+                },
             })
 
             if (!userExists) {
@@ -234,6 +234,7 @@ export default class UserController implements IControllerBase {
             return res.status(500).json(errorMessage(error))
         }
     }
+
     resetPassword1 = async (req: Request, res: Response) => {
         try {
             const { email } = req.body;
@@ -300,6 +301,27 @@ export default class UserController implements IControllerBase {
 
     }
 
+    getNotifications = async (req: AuthenticatedRequest, res: Response) => {
+        try {
+            const currentUser = req?.user
+            const filter = {};
+
+            if (currentUser?.role === user_role.company) {
+                //@ts-ignore
+                filter["companyId"] = currentUser?.companyId
+            } else {
+                //@ts-ignore
+                filter["vendorId"] = currentUser?.id
+            }
+            const result = await this.prisma.notification.findMany({
+                include: { order: { include: { customer: { select: { email: true, name: true } } } } },
+                where: { ...filter }, 
+            })
+            return res.status(200).json({ result })
+        } catch (error) {
+            return res.status(500).json(errorMessage(error))
+        }
+    }
 
 }
 
