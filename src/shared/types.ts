@@ -41,17 +41,21 @@ export interface UserContextType {
     userDispatch: React.Dispatch<{ payload?: any, type: Action_Type }>
 }
 
+export type Product = {
+    id: string,
+    details: string | null,
+    name: string,
+    price: number | null,
+}
 
 export type Order = {
     id: string,
-    productId: string,
-    productDetails: string | null,
-    productName: string,
+    products: Product[],
     vendorId: string | null,
     vendor: User | null,
     customerId: string | null,
     customer: User | null,
-    amount: number | null,
+    totalAmount: number | null,
     vendorDelivered: boolean,
     vendorDeliveredOn: Date | null,
     userReceived: boolean,
@@ -60,5 +64,6 @@ export type Order = {
     createdAt: Date,
     updatedAt: Date,
     order_status: order_status
-    company: Company | null
+    company: Company | null,
+    orderRef: string | null,
 }

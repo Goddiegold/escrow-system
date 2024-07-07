@@ -4,8 +4,8 @@ import { toast } from "@/shared/helpers";
 import { useQuery } from "@tanstack/react-query";
 import { Order as OrderType, order_status, user_role } from "@/shared/types";
 import {
-    Badge, Center, Flex, NumberFormatter,
-    Skeleton, Table, Text
+    Badge, Center, Flex, List, NumberFormatter,
+    Skeleton, Spoiler, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
 import { Link, useParams } from "react-router-dom";
@@ -65,14 +65,21 @@ const AllOrders = () => {
                                     <Text fz={"xs"} c={"dimmed"}>{item?.vendor?.email}</Text>
                                 </Table.Td>}
 
-                                <Table.Td>
-                                    <Flex direction={"column"}>
-                                        <Text size="sm">ID: {item.productId}</Text>
-                                        <Text size="sm">Name: {item.productName}</Text>
-                                        <Text size="sm">Amount: <NumberFormatter
-                                            thousandSeparator
-                                            prefix="NGN "
-                                            value={item.amount} /></Text>
+                                <Table.Td maw={500}>
+                                    <Flex direction={"column"} >
+                                        <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide">
+                                            <List listStyleType="disc">
+                                                {item.products.map(item => (
+                                                    <List.Item >
+                                                        <Text size="sm">id: {item.id}, name: {item.name}, amount: <NumberFormatter
+                                                            thousandSeparator
+                                                            prefix="₦"
+                                                            value={item.price} /></Text>
+                                                        {item.details && <Text size="sm">details:{item.details}</Text>}
+                                                    </List.Item>
+                                                ))}
+                                            </List>
+                                        </Spoiler>
                                     </Flex>
                                 </Table.Td>
 

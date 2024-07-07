@@ -5,9 +5,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Order, Order as OrderType, order_status, user_role } from "@/shared/types";
 import {
     ActionIcon,
-    Badge, Center, Flex, NumberFormatter,
+    Badge, Center, Flex, List, NumberFormatter,
     Select,
-    Skeleton, Space, Table, Text
+    Skeleton, Space, Spoiler, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
 import { Link, useParams } from "react-router-dom";
@@ -42,17 +42,9 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
                 })
 
             if (!cancelOrder) {
-                queryClient.setQueryData(["successfull-orders", user?.id], (data: {
-                    result: OrderType[],
-                    orders: OrderType[]
-                } | null) => {
-                    if (!data) return;
-                    return {
-                        orders: [{ ...item, order_status: orderStatus, vendorDelivered: true}, ...data.orders],
-                        result: data?.result,
-                    }
-
-                })
+                queryClient.invalidateQueries(
+                    { queryKey: ["successfull-orders", user?.id] }
+                )
             }
 
             queryClient.setQueryData(["all-orders", user?.id], (data: Order[] | null) => {
@@ -93,15 +85,21 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
                     className="text-color-1 text-xs underline">more orders</Link> */}
             </Table.Td>}
 
-
-            <Table.Td>
-                <Flex direction={"column"}>
-                    <Text size="sm">ID: {item.productId}</Text>
-                    <Text size="sm">Name: {item.productName}</Text>
-                    <Text size="sm">Amount: <NumberFormatter
-                        thousandSeparator
-                        prefix="NGN "
-                        value={item.amount} /></Text>
+            <Table.Td maw={500}>
+                <Flex direction={"column"} >
+                    <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide">
+                        <List listStyleType="disc">
+                            {item.products.map(item => (
+                                <List.Item >
+                                    <Text size="sm">id: {item.id}, name: {item.name}, amount: <NumberFormatter
+                                        thousandSeparator
+                                        prefix="₦"
+                                        value={+item.price} /></Text>
+                                    {item.details && <Text size="sm">details:{item.details}</Text>}
+                                </List.Item>
+                            ))}
+                        </List>
+                    </Spoiler>
                 </Flex>
             </Table.Td>
 

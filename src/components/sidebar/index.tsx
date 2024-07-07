@@ -6,7 +6,7 @@ import { menuData, removeUserToken } from '@/shared/helpers';
 import { useUserContext } from '@/context/UserContext';
 import { Action_Type, user_role } from '@/shared/types';
 import { BuildingOffice, Handshake, Wallet } from '@phosphor-icons/react';
-import { useLocation} from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import useNavigation from '@/hooks/useNavigation';
 
 export function NavbarSimpleColored() {
@@ -62,7 +62,10 @@ export function NavbarSimpleColored() {
   }, [user]);
 
   useEffect(() => {
-    setActive(pathname)
+    const urlPaths = pathname.split('/');
+    console.log("urlPaths", urlPaths)
+    const currentPath = `/${urlPaths[1]}/${urlPaths[2]}`
+    setActive(currentPath)
   }, [pathname])
 
   const links = userMenuData.map((item) => (

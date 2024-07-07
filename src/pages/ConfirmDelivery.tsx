@@ -2,7 +2,8 @@ import Logo from "@/components/shared/Logo";
 import client from "@/shared/client";
 import { toast } from "@/shared/helpers";
 import { Order } from "@/shared/types";
-import { Button, Flex, Popover, Rating, Skeleton, Space, Text, Textarea } from "@mantine/core";
+import { Button, Flex, LoadingOverlay, Popover, Rating, Space, Text, Textarea } from "@mantine/core";
+import { CheckCircle } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -31,13 +32,15 @@ const ConfirmDelivery = () => {
   }, [orderId])
 
 
-  const handleConfimation = () => {
+  const handleConfimation = (receivedOrder: boolean) => {
     setLoading2(true)
-    client().post(`/orders/confirm-delivery/${orderId}`, { ...rating })
+    client().post(`/orders/confirm-delivery/${orderId}`, { rating, receivedOrder })
       .then(res => {
         toast(res.data?.message).success()
         setLoading2(false)
-        navigate("/")
+        if (receivedOrder && currentOrder) {
+          setCurrentOrder({ ...currentOrder, userReceived: true })
+        }
       }).catch(err => {
         setLoading2(false)
         toast(err?.response?.data?.message).error()
@@ -46,59 +49,80 @@ const ConfirmDelivery = () => {
   }
 
   return (
-    <Flex direction={"column"} className="border" h={"100vh"}>
-      <Skeleton visible={loading1} maw={500} mx={"auto"} my={"auto"}>
-        <Flex
-          align={'center'}
-          maw={500}
-          mx={"auto"}
-          direction={'column'}
-          justify={'center'} mah={'100vh'} p={20}>
-          <Logo />
+    <Flex direction={"column"} h={"100vh"}>
+      <LoadingOverlay visible={loading1} zIndex={1000}
+        overlayProps={{ radius: "sm", blur: 2 }} />
+      <Flex
+        align={'center'}
+        maw={500}
+        mx={"auto"}
+        my={"auto"}
+        direction={'column'}
+        justify={'center'} mah={'100vh'}
+        p={20}>
+        <Logo />
 
-          {currentOrder && <Flex my={20} direction={'column'}>
+        {currentOrder && !currentOrder?.userReceived ? <Flex my={20} direction={'column'}>
+          <Text fw={500} size={"xl"} ta={"center"} mb={10}>Hi there 👋</Text>
+          <Text fw={400}
+          >
+            Please confirm if your order {currentOrder.orderRef} with
+            {currentOrder?.company?.name} has been delivered by {currentOrder?.vendor?.name}.</Text>
+          <Flex my={10} direction={"column"}>
+            <Rating
+              fractions={4}
+              value={rating.value}
+              size="xl" my={10}
+              onChange={value => setRating({ ...rating, value })} />
+            <Textarea
+              className="w-full"
+              minRows={5} maxRows={7}
+              my={10}
+              value={rating.review}
+              onChange={({ target }) =>
+                setRating({
+                  ...rating,
+                  review: target.value
+                })} />
+          </Flex>
+
+          <Flex className="flex flex-col sm:flex-row" my={10} align={"center"} justify={"center"}>
+            <Button color="dark" fw={400}>No (I haven't received the order)</Button>
+            <Space mx={"xs"} />
+            <Popover width={200} position="bottom" withArrow shadow="md">
+              <Popover.Target>
+                <Button color="red" fw={400}>Yes (I have received the order)</Button>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Text size="sm">Are you sure you've received the delivery?</Text>
+                <Flex justify={"space-between"} my={5}>
+                  <Button color="black" size="xs"
+                    loading={loading2}
+                    onClick={() => handleConfimation(false)}>No</Button>
+                  <Button color="red" size="xs"
+                    loading={loading2}
+                    onClick={() => handleConfimation(true)}>Yes</Button>
+                </Flex>
+              </Popover.Dropdown>
+            </Popover>
+          </Flex>
+        </Flex> :
+          <Flex my={20} direction={'column'}>
             <Text fw={500} size={"xl"} ta={"center"} mb={10}>Hi there 👋</Text>
-            <Text fw={400}
-            >
-              Please confirm if your order #{orderId} with {currentOrder?.company?.name} has been delivered.</Text>
-            <Flex my={10} direction={"column"}>
-              <Rating
-                fractions={4}
-                value={rating.value}
-                size="xl" my={10}
-                onChange={value => setRating({ ...rating, value })} />
-              <Textarea
-                className="w-full"
-                minRows={5} maxRows={7}
-                my={10}
-                value={rating.review}
-                onChange={({ target }) =>
-                  setRating({
-                    ...rating,
-                    review: target.value
-                  })} />
-            </Flex>
-
-            <Flex className="flex flex-col sm:flex-row" my={10} align={"center"} justify={"center"}>
-              <Button color="dark" fw={400}>No (I haven't received the order)</Button>
-              <Space mx={"xs"} />
-              <Popover width={200} position="bottom" withArrow shadow="md">
-                <Popover.Target>
-                  <Button color="red" fw={400}>Yes (I have received the order)</Button>
-                </Popover.Target>
-                <Popover.Dropdown>
-                  <Text size="sm">Are you sure you've received the delivery?</Text>
-                  <Flex justify={"space-between"} my={5}>
-                    <Button color="black" size="xs">No</Button>
-                    <Button color="red" size="xs">Yes</Button>
-                  </Flex>
-                </Popover.Dropdown>
-              </Popover>
+            <Flex direction={"column"} my={20}>
+              <CheckCircle size={100} color="#228be6" className="mx-auto" />
+              <Text my={10}>This Order has been confirmed successfully, if you didn't confirm it contact support.</Text>
+              <Flex justify={"flex-start"}>
+                <Button
+                  variant="transparent"
+                  p={0} mx={0}>
+                  support@escrowsystem.com
+                </Button>
+              </Flex>
             </Flex>
           </Flex>}
 
-        </Flex>
-      </Skeleton>
+      </Flex>
     </Flex>
   );
 }

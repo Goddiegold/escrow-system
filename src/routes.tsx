@@ -86,7 +86,7 @@ const router = createBrowserRouter([
                 element: <VerifyOtp />
             },
             {
-                path: "confirm-delivery/:orderId",
+                path: "/confirm-delivery/:orderId",
                 element: <ConfirmDelivery />
             }
         ]

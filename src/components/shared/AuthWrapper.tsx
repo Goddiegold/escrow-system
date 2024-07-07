@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { userToken } from "../../shared/helpers";
 
 interface AuthWrapperProps {
@@ -9,11 +9,13 @@ interface AuthWrapperProps {
 const AuthWrapper: React.FC<AuthWrapperProps> = ({
   children,
 }) => {
+  const { search } = useLocation()
   const token = userToken()
+  const redirectUrl = new URLSearchParams(search).get("redirect");
   if (token) {
     return <>{children}</>;
   } else {
-     return <Navigate to={"/login"}/>
+    return <Navigate to={redirectUrl || "/login"} />
   }
 };
 

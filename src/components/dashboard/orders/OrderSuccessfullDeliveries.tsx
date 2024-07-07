@@ -4,9 +4,9 @@ import { toast } from "@/shared/helpers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Order as OrderType, order_status, user_role } from "@/shared/types";
 import {
-    Badge, Center, Flex, NumberFormatter,
+    Badge, Center, Flex, List, NumberFormatter,
     Select,
-    Skeleton, Table, Text
+    Skeleton, Spoiler, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
 import { Link, useParams } from "react-router-dom";
@@ -26,7 +26,7 @@ const SuccessfullPendingDeliveries = () => {
         queryKey: ["successfull-orders", companyId ?? user?.id],
         queryFn: () => clientInstance().get(
             isAdmin ? "/orders/all?status=delivered" :
-            `/orders/company-orders/${companyId ?? user?.companyId}?status=delivered`)
+                `/orders/company-orders/${companyId ?? user?.companyId}?status=delivered`)
             .then(res => {
                 const orders = res.data?.result as OrderType[]
                 return {
@@ -106,9 +106,9 @@ const SuccessfullPendingDeliveries = () => {
                                     <Flex direction={"column"}>
                                         <Text fz="sm">{item?.customer?.name}</Text>
                                         <Text fz={"xs"} c={"dimmed"}>{item.customer?.email}</Text>
-                                        <Link
+                                        {/* <Link
                                             to={"#"}
-                                            className="text-color-1 text-xs underline">more orders</Link>
+                                            className="text-color-1 text-xs underline">more orders</Link> */}
                                     </Flex>
                                 </Table.Td>
 
@@ -121,14 +121,21 @@ const SuccessfullPendingDeliveries = () => {
                                 </Table.Td>}
 
 
-                                <Table.Td>
-                                    <Flex direction={"column"}>
-                                        <Text size="sm">ID: {item.productId}</Text>
-                                        <Text size="sm">Name: {item.productName}</Text>
-                                        <Text size="sm">Amount: <NumberFormatter
-                                            thousandSeparator
-                                            prefix="NGN "
-                                            value={item.amount} /></Text>
+                                <Table.Td maw={500}>
+                                    <Flex direction={"column"} >
+                                        <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide">
+                                            <List listStyleType="disc">
+                                                {item.products.map(item => (
+                                                    <List.Item >
+                                                        <Text size="sm">id: {item.id}, name: {item.name}, amount: <NumberFormatter
+                                                            thousandSeparator
+                                                            prefix="₦"
+                                                            value={+item.price} /></Text>
+                                                        {item.details && <Text size="sm">details:{item.details}</Text>}
+                                                    </List.Item>
+                                                ))}
+                                            </List>
+                                        </Spoiler>
                                     </Flex>
                                 </Table.Td>
 
