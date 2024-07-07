@@ -17,17 +17,17 @@ function BackgroundLayout({ title, children, bottomContent }: BackgroundLayoutPr
     return (
         <Flex
             mih={"100vh"}
-            className='flex flex-row justify-center items-center'>
-            <Flex className={`w-[50%] hidden md:flex min-h-full`} style={{ height: window.innerHeight }}>
+            className='flex flex-row'>
+
+            <Flex className={`w-[50%] hidden lg:flex`} mih={"100vh"}>
                 <BackgroundImage
                     src={handshakePic}
                 >   </BackgroundImage>
             </Flex>
-            <Flex className="flex flex-col w-full md:w-[50%] h-full my-auto">
-                <Flex className="flex-col items-center h-full "
-                    maw={400}
-                    mx={"auto"}>
+            <Flex className="flex flex-col w-full lg:w-[50%] h-full my-auto">
+                <Flex className="flex-col w-full items-center h-full font-primary">
                     <Paper
+                        maw={400}
                         withBorder
                         p={30}
                         radius={"sm"}
@@ -41,8 +41,9 @@ function BackgroundLayout({ title, children, bottomContent }: BackgroundLayoutPr
                     </Paper>
                     {bottomContent &&
                         <Paper withBorder
-                            p={10} mt={10} radius="sm"
                             w={"100%"}
+                            p={10} mt={10} radius="sm"
+                            maw={400}
                         >
                             <Group justify="center" m={10}>
                                 {bottomContent}

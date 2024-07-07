@@ -67,3 +67,22 @@ export type Order = {
     company: Company | null,
     orderRef: string | null,
 }
+
+export enum notification_type {
+    customer_placed_order = 'customer_placed_order',  //for vendor 
+    delivery_confirmed = 'delivery_confirmed', //for vendor
+    order_delivered = 'order_delivered',
+    order_cancelled = 'order_cancelled',
+}
+
+export type NotificationType = {
+    id: string
+    type: notification_type
+    orderId: string | null
+    orderRef: string | null
+    vendorId: string | null
+    companyId: string | null
+    message: string | null
+    order: Order | null,
+    createdAt: Date | null
+}

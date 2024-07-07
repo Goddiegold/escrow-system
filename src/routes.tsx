@@ -12,6 +12,7 @@ import Orders from "./pages/dashboard/Orders";
 import AllVendorOrCompanyOrders from "./pages/dashboard/AllVendorOrCompanyOrders";
 import RegisteredCompanies from "./pages/dashboard/RegisteredCompanies";
 import ConfirmDelivery from "./pages/ConfirmDelivery";
+import NotificationsPage from "./pages/dashboard/NotificationsPage";
 
 const router = createBrowserRouter([
     {
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
                 path: "/dashboard/settings/:tabValue",
                 element: <Settings />,
             },
+            {
+                path: "/dashboard/notifications",
+                element: <NotificationsPage />
+            }
         ],
     },
     {

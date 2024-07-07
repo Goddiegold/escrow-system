@@ -3,10 +3,11 @@ import {
     Text, Tooltip, useMantineColorScheme
 } from "@mantine/core";
 import Logo from "./Logo";
-import { CaretRight, Moon, Sun } from "@phosphor-icons/react";
+import { Bell, CaretRight, Moon, Sun } from "@phosphor-icons/react";
 import { getInitials, menuData } from "@/shared/helpers";
 import { IoMdLogOut } from "react-icons/io";
 import { useUserContext } from "@/context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardHeaderProps {
     mobileOpened: boolean,
@@ -18,6 +19,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
     ({ mobileOpened, toggleMobile }) => {
         const { colorScheme, toggleColorScheme } = useMantineColorScheme();
         const dark = colorScheme === 'dark';
+        const navigate = useNavigate()
 
         const MenuOptions = () => {
             return (<>
@@ -49,6 +51,19 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                                 {dark ? <Sun size={25} color='gray' /> : <Moon size={25} color='gray' />}
                             </ActionIcon>
                         </Tooltip>
+
+                        <ActionIcon
+                            onClick={() => navigate("/dashboard/notifications")}
+                            size={'lg'}
+                            radius={10}
+                            mx={5}
+                            variant="transparent"
+                            // variant="outline"
+                            color='gray'
+                            title="Toggle color scheme"
+                        >
+                            <Bell size={25} />
+                        </ActionIcon>
                     </Flex>
 
                     <Menu shadow="md" width={200}>
