@@ -23,8 +23,9 @@ async function sendEmail(mailData: any) {
         // const smtpTransport = nodemailer.createTransport(mg(mailgunAuth));
         const smtpTransport = nodemailer.createTransport({
             //@ts-ignore
-            host: process.env.MAIL_HOST as string,
-            port: process.env.MAIL_PORT,
+            host: process.env.MAIL_TRANSPORT_HOST as string,
+            // port: process.env.MAIL_PORT,
+            port: 2525,
             secure: false,
             auth: {
                 user: process.env.MAIL_AUTH_USER,
@@ -42,7 +43,7 @@ async function sendEmail(mailData: any) {
 
 
         const mailOptions = {
-            from: `Escrow <${process.env.MAIL_DOMAIN}>`,
+            from: "Escrow <mailtrap@demomailtrap.com>",
             to: mailData?.email,
             subject: content?.subject,
             html: htmlToSend,

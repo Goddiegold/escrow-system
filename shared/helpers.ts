@@ -50,16 +50,16 @@ export const validateRequestBody = (
     [RequestType.SIGN_IN]: Joi.object({ email: commonSchema.email, password: commonSchema.password }),
     [RequestType.SIGN_UP]: Joi.object(commonSchema),
     [RequestType.PLACE_ORDER]: Joi.object({
-      productId: Joi.string().required().min(3),
-      productDetails: Joi.string().optional().min(3),
-      productName: Joi.string().min(3),
-
-      vendorId: Joi.string().required().label("Vendor's ID"),
-
+      products: Joi.array().items(Joi.object({
+        vendor: Joi.string().email().required().label("Vendor's email"),
+        id: Joi.string().required().label("Product's Id"),
+        name: Joi.string().required().label("Product's name"),
+        quantity: Joi.number().required(),
+        price: Joi.number().required(),
+        details: Joi.string().label("Product's details").optional(),
+      })).required(),
       customerEmail: Joi.string().email().label("Customer's email").required(),
       customerName: commonSchema.name.label("Customer's name"),
-
-      amount: Joi.number().required()
     }),
   }
 

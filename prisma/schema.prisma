@@ -46,48 +46,36 @@ model User {
   company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
   companyId String?  @db.ObjectId
 
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
-  // customerNotifications Notification[] @relation("customerNotifications")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   vendorNotifications  Notification[] @relation("vendorNotifications")
   companyNotifications Notification[] @relation("companyNotifications")
 }
 
 model Order {
-  id             String  @id @default(auto()) @map("_id") @db.ObjectId
-  productId      String
-  productDetails String?
-  productName    String
-
-  vendorId String? @db.ObjectId
-  vendor   User?   @relation("vendorOrders", fields: [vendorId], references: [id], onDelete: SetNull)
-
-  customerId String? @db.ObjectId
-  customer   User?   @relation("customerOrders", fields: [customerId], references: [id], onDelete: SetNull)
-
-  amount Float?
-
-  vendorDelivered   Boolean   @default(false)
+  id                String         @id @default(auto()) @map("_id") @db.ObjectId
+  customerId        String?        @db.ObjectId
+  customer          User?          @relation("customerOrders", fields: [customerId], references: [id], onDelete: SetNull)
+  vendorId          String?        @db.ObjectId
+  vendor            User?          @relation("vendorOrders", fields: [vendorId], references: [id], onDelete: SetNull)
+  vendorDelivered   Boolean        @default(false)
   vendorDeliveredOn DateTime?
-
-  userReceived   Boolean   @default(false)
-  userReceivedOn DateTime?
-
-  userPaid   Boolean   @default(false)
-  userPaidOn DateTime?
-
-  rating Rating?
-
-  company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?  @db.ObjectId
-
-  order_status order_status @default(pending)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  orderRef      String?
-  notifications Notification[]
+  userReceived      Boolean        @default(false)
+  userReceivedOn    DateTime?
+  userPaid          Boolean        @default(false)
+  userPaidOn        DateTime?
+  rating            Rating?
+  company           Company?       @relation(fields: [companyId], references: [id])
+  companyId         String?        @db.ObjectId
+  order_status      order_status   @default(pending)
+  orderRef          String?
+  notifications     Notification[]
+  products          Json[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  totalAmount       Float?
+  authCode          String?
 }
 
 enum order_status {
@@ -124,6 +112,7 @@ model Notification {
   type      notification_type
   order     Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
   orderId   String?           @db.ObjectId
+  orderRef  String?
   vendor    User?             @relation("vendorNotifications", fields: [vendorId], references: [id], onDelete: SetNull)
   vendorId  String?           @db.ObjectId
   company   User?             @relation("companyNotifications", fields: [vendorId], references: [id], onDelete: SetNull)
@@ -135,5 +124,5 @@ enum notification_type {
   customer_placed_order @map("customer_placed_order")
   order_cancelled       @map("order_cancelled")
   order_delivered       @map("order_delivered")
-  delivery_confirmed       @map("delivery_confirmed")
+  delivery_confirmed    @map("delivery_confirmed")
 }
