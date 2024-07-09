@@ -1,7 +1,8 @@
 import { useUserContext } from "@/context/UserContext";
+import useNavigation from "@/hooks/useNavigation";
 import client, { useClient } from "@/shared/client";
 import { convertAmount, getInitials, toast } from "@/shared/helpers";
-import { notification_type, NotificationType, User } from "@/shared/types";
+import { notification_type, NotificationType, User, user_role } from "@/shared/types";
 import {
     ActionIcon, Avatar, Button, Center, Flex, Paper,
     Skeleton, Space, Spoiler, Text, Tooltip
@@ -26,7 +27,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ ...props }) => {
     const queryClient = useQueryClient()
     const [loading, setLoading] = useState(false)
     const { width } = useViewportSize()
-    const navigate = useNavigate()
+    const navigate = useNavigation()
 
     // const proceedBtnVisible = 
 
@@ -82,7 +83,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ ...props }) => {
                             loading={loading}>
                             <Check size={20} /></ActionIcon>
                     </Tooltip>
-                    <Button variant="transparent" p={0} size="xs" onClick={() => navigate(props.path)}>Proceed</Button>
+                    <Button variant="transparent" p={0} size="xs" onClick={() => navigate(props!.path)}>Proceed</Button>
                 </Flex>
             </Flex>
         </Paper >
@@ -104,11 +105,13 @@ const NotificationsPage = () => {
                 toast(error?.response?.data?.message).error()
             }
         },
-        refetchOnMount: "always",
+        // refetchOnMount: "always",
         refetchInterval: 1200000,
     })
 
     const isFetching = isLoading || isRefetching;
+
+    const isVendor = user?.role === user_role.vendor;
 
 
     const renderNotificationItems = (items: NotificationType[]) => {
@@ -121,12 +124,26 @@ const NotificationsPage = () => {
 
             switch (notificationType) {
                 case notification_type.customer_placed_order:
-                    message = `${customer?.name || 'A customer'} just placed an order on your store. Order reference: ${orderRef}`;
-                    path = "/dashboard/orders"
+                    message = `${customer?.name || 'A customer'} just placed an order ${isVendor ? "on your store" : `with ${item.vendor?.name}`}. Order Ref: ${orderRef}`
+                        ;
+                    path = isVendor ? "/dashboard/orders" : `/dashboard/vendor-orders/${item!.vendor!.id}`
                     break;
+
                 case notification_type.delivery_confirmed:
-                    message = `${customer?.name || 'A customer'} just confirmed that order ${orderRef} ${order?.userReceived ? "has been received successfully" : "hasn't been received"}.${order?.userReceived && ` You've been credited with ₦${convertAmount(order.totalAmount)}`}`;
-                    path = order?.userReceived ? "/dashboard/wallet/" : "/dashboard/orders"
+                    message = `${customer?.name || 'A customer'} just confirmed that order ${orderRef} ${!isVendor && `with ${item.vendor?.name}`} ${order?.userReceived ? "has been received successfully" : "hasn't been received"}. ${isVendor && order?.userReceived && ` You've been credited with ₦${convertAmount(order!.totalAmount as number)}`}`
+
+                    path = isVendor ? (order?.userReceived ? "/dashboard/wallet/" : "/dashboard/orders") :
+                        `/dashboard/vendor-orders/${item!.vendor!.id}`;
+                    break;
+
+                case notification_type.order_delivered:
+                    message = !isVendor ? `Order ${orderRef} with ${item?.vendor?.name} for ${customer?.name} have been updated to delivered` : `You've updated order ${orderRef} for ${customer?.name} to delivered`;
+                    path = isVendor ? "/dashboard/orders" : `/dashboard/vendor-orders/${item!.vendor!.id}`;
+                    break;
+
+                case notification_type.order_cancelled:
+                    message = !isVendor ? `Order ${orderRef} with ${item?.vendor?.name} for ${customer?.name} have been cancelled` : `You've cancelled order ${orderRef} for ${customer?.name}`;
+                    path = isVendor ? "/dashboard/orders" : `/dashboard/vendor-orders/${item!.vendor!.id}`;
                     break;
                 default:
                     message = "You have a new notification.";

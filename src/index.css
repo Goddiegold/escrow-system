@@ -686,10 +686,6 @@ video {
   flex-direction: column;
 }
 
-.flex-wrap{
-  flex-wrap: wrap;
-}
-
 .items-start{
   align-items: flex-start;
 }
@@ -783,6 +779,11 @@ video {
   font-family: Roboto;
 }
 
+.\!text-xs{
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+}
+
 .text-\[15rem\]{
   font-size: 15rem;
 }
@@ -790,11 +791,6 @@ video {
 .text-xs{
   font-size: 0.75rem;
   line-height: 1rem;
-}
-
-.\!text-xs{
-  font-size: 0.75rem !important;
-  line-height: 1rem !important;
 }
 
 .font-black{
@@ -909,10 +905,6 @@ button{
   .md\:hidden{
     display: none;
   }
-
-  .md\:flex-nowrap{
-    flex-wrap: nowrap;
-  }
 }
 
 @media (min-width: 1024px){
@@ -926,9 +918,5 @@ button{
 
   .lg\:w-\[50\%\]{
     width: 50%;
-  }
-
-  .lg\:flex-nowrap{
-    flex-wrap: nowrap;
   }
 }
