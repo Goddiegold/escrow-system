@@ -316,11 +316,12 @@ export default class UserController implements IControllerBase {
             }
             const result = await this.prisma.notification.findMany({
                 include: {
+                    vendor: { select: { id: true, name: true } },
                     order: {
                         include: { customer: { select: { email: true, name: true } } }
                     }
                 },
-                where: { ...filter, read: false },
+                where: { ...filter, read: false  },
                 orderBy: {
                     createdAt: "desc"
                 }

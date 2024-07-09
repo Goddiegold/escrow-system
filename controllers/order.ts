@@ -310,7 +310,7 @@ export default class OrderController implements IControllerBase {
                 await this.prisma.notification.create({
                     data: {
                         companyId: result.companyId,
-                        vendorId: result.companyId,
+                        vendorId: updateOrder.vendorId,
                         orderId,
                         type: orderIsCancelled ? notification_type.order_cancelled :
                             notification_type.order_delivered,
@@ -318,17 +318,28 @@ export default class OrderController implements IControllerBase {
                     }
                 })
 
-
-                mailService({
-                    subject: `Confirm if your order ${updateOrder.orderRef} has been delivered`,
-                    email: updateOrder.customer?.email,
-                    template: "confirmOrderDelivery",
-                    companyName: updateOrder.company?.name,
-                    orderRef: updateOrder.orderRef,
-                    url: `${process.env.FRONTEND_URL}/confirm-delivery/${updateOrder.id}`,
-                    name: updateOrder.customer?.name,
-                    vendor: updateOrder.vendor?.name
-                })
+                if (orderIsDelivered) {
+                    mailService({
+                        subject: `Confirm if your order ${updateOrder.orderRef} has been delivered`,
+                        email: updateOrder.customer?.email,
+                        template: "confirmOrderDelivery",
+                        companyName: updateOrder.company?.name,
+                        orderRef: updateOrder.orderRef,
+                        url: `${process.env.FRONTEND_URL}/co nfirm-delivery/${updateOrder.id}`,
+                        name: updateOrder.customer?.name,
+                        vendor: updateOrder.vendor?.name
+                    })
+                }else{
+                    mailService({
+                        subject: `Order ${updateOrder.orderRef} has been cancelled`,
+                        email: updateOrder.customer?.email,
+                        template: "orderCancelled",
+                        companyName: updateOrder.company?.name,
+                        orderRef: updateOrder.orderRef,
+                        name: updateOrder.customer?.name,
+                        vendor: updateOrder.vendor?.name
+                    })
+                }
             }
 
 
@@ -408,6 +419,7 @@ export default class OrderController implements IControllerBase {
                 await this.prisma.notification.create({
                     data: {
                         orderId,
+                        orderRef: order.orderRef,
                         vendorId: order.vendorId,
                         companyId: order?.companyId,
                         type: notification_type.delivery_confirmed
