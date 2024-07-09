@@ -33,6 +33,7 @@ export default class UserController implements IControllerBase {
         this.router.put("/update-profile", userAuth, this.updateProfile)
         this.router.put("/update-password", userAuth, this.updatePassword)
         this.router.get("/notifications", [userAuth, requireRole([user_role.company, user_role.vendor])], this.getNotifications)
+        this.router.put("/notifications/:notificationId", [userAuth, requireRole([user_role.company, user_role.vendor])], this.markNotificationAsRead)
     }
 
     login = async (req: Request, res: Response) => {
@@ -314,8 +315,15 @@ export default class UserController implements IControllerBase {
                 filter["vendorId"] = currentUser?.id
             }
             const result = await this.prisma.notification.findMany({
-                include: { order: { include: { customer: { select: { email: true, name: true } } } } },
-                where: { ...filter }, 
+                include: {
+                    order: {
+                        include: { customer: { select: { email: true, name: true } } }
+                    }
+                },
+                where: { ...filter, read: false },
+                orderBy: {
+                    createdAt: "desc"
+                }
             })
             return res.status(200).json({ result })
         } catch (error) {
@@ -323,5 +331,31 @@ export default class UserController implements IControllerBase {
         }
     }
 
+    markNotificationAsRead = async (req: AuthenticatedRequest, res: Response) => {
+        try {
+            const filter = {};
+            const currentUser = req?.user;
+            const notificationId = req?.params?.notificationId as string;
+
+            if (currentUser?.role === user_role.company) {
+                //@ts-ignore
+                filter["companyId"] = currentUser?.companyId
+            } else {
+                //@ts-ignore
+                filter["vendorId"] = currentUser?.id
+            }
+
+            const notificationExist = await this.prisma.notification.findFirst({
+                where: { id: notificationId, ...filter }
+            })
+
+            if (!notificationExist) return res.status(404).json({ message: "Notification not found!" })
+            await this.prisma.notification.update({ where: { id: notificationId }, data: { read: true } })
+
+            return res.json({ message: "Updated successfully!" })
+        } catch (error) {
+            return res.status(500).json(errorMessage(error))
+        }
+    }
 }
 
