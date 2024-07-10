@@ -64,7 +64,7 @@ export function NavbarSimpleColored() {
   useEffect(() => {
     const urlPaths = pathname.split('/');
     console.log("urlPaths", urlPaths)
-    const currentPath = `/${urlPaths[1]}/${urlPaths[2]}`
+    const currentPath = urlPaths[2] ? `/${urlPaths[1]}/${urlPaths[2]}` : `/${urlPaths[1]}`
     setActive(currentPath)
   }, [pathname])
 
