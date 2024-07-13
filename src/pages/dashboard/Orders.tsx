@@ -27,7 +27,9 @@ const Orders = () => {
                 <BackBtn />
             </Flex>
             <Card shadow="sm" padding="sm" radius="md"
-                withBorder mih={500} component={ScrollArea}>
+                withBorder mih={500}
+                 component={ScrollArea}
+                 >
                 <Tabs
                     defaultValue="all"
                     value={tabValue}

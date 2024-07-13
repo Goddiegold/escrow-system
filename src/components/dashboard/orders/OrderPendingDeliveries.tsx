@@ -10,9 +10,11 @@ import {
     Skeleton, Space, Spoiler, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { Check, X } from "@phosphor-icons/react";
+import useSearchOrders from "@/hooks/useSearchOrders";
+import usePagination from "@/hooks/usePagination";
 
 interface TableRowProps {
     item: Order
@@ -168,12 +170,18 @@ const OrderPendingDeliveries = () => {
     })
 
     const isNotVendor = (user?.role === user_role.admin) || (user?.role === user_role.company)
+    const { SearchInput, queryResult,
+        query, dataNotFound, dataFound } = useSearchOrders(data || [])
+    const itemsPerPage = 5;
+    const { PaginationBtn, data: paginatedData } = usePagination((!query ? data : queryResult) || [],
+        itemsPerPage)
 
     return (
         <>
             {isLoading && <Flex w={"100%"}>
                 <Skeleton w={"100%"} h={50} />
             </Flex>}
+            {!isLoading && <SearchInput />}
             <Table
                 striped="even"
                 horizontalSpacing={"md"}
@@ -191,7 +199,7 @@ const OrderPendingDeliveries = () => {
                 </Table.Thead>}
                 <Table.Tbody>
                     {data && data?.length > 0 ? <>
-                        {data.map(item => (
+                        {paginatedData.map(item => (
                             <TableRow item={item} />
                         ))}
                     </> : null}
@@ -223,11 +231,15 @@ const OrderPendingDeliveries = () => {
                     </>}
                 </Table.Tbody>
             </Table>
-            {data?.length === 0 &&
-                <Center my={50}>
+            {!isLoading && <Center my={dataNotFound ? 50 : 0}>
+                {dataNotFound ?
                     <Text>No data found</Text>
-                </Center>
-            }
+                    :
+                    <>
+                        {dataFound && <PaginationBtn />}
+                    </>
+                }
+            </Center>}
         </>
     );
 }

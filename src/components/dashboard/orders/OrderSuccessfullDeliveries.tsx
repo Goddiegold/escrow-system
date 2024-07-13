@@ -11,6 +11,8 @@ import {
 import AppSkeleton from "@/components/AppSkeleton";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import useSearchOrders from "@/hooks/useSearchOrders";
+import usePagination from "@/hooks/usePagination";
 
 
 const SuccessfullPendingDeliveries = () => {
@@ -66,12 +68,19 @@ const SuccessfullPendingDeliveries = () => {
 
     }, [orderStatus])
 
+    const { SearchInput, queryResult,
+        query, dataNotFound, dataFound } = useSearchOrders(data?.result || [])
+    const itemsPerPage = 5;
+    const { PaginationBtn, data: paginatedData } = usePagination((!query ? data?.result : queryResult) || [],
+        itemsPerPage)
+
 
     return (
         <>
             {isLoading && <Flex w={"100%"}>
                 <Skeleton w={"100%"} h={50} />
             </Flex>}
+            {!isLoading && <SearchInput />}
             <Flex justify={"flex-end"}>
                 <Select
                     value={orderStatus}
@@ -101,7 +110,7 @@ const SuccessfullPendingDeliveries = () => {
                 </Table.Thead>}
                 <Table.Tbody>
                     {data?.result && data?.result.length > 0 ? <>
-                        {data.result.map(item => (
+                        {paginatedData.map(item => (
                             <Table.Tr>
                                 <Table.Td>
                                     <Text size="sm">
@@ -191,11 +200,15 @@ const SuccessfullPendingDeliveries = () => {
                     </>}
                 </Table.Tbody>
             </Table>
-            {data?.result?.length === 0 &&
-                <Center my={50}>
+            {!isLoading && <Center my={dataNotFound ? 50 : 0}>
+                {dataNotFound ?
                     <Text>No data found</Text>
-                </Center>
-            }
+                    :
+                    <>
+                        {dataFound && <PaginationBtn />}
+                    </>
+                }
+            </Center>}
         </>
     );
 }

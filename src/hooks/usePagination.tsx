@@ -22,7 +22,7 @@ function usePagination<T>(data: T[], itemsPerPage = 7, withControls = true) {
             withControls={withControls}
             // color="purple"
             // className="!mx-auto"
-            size={'sm'}
+            size={'md'}
             value={currentPage}
             total={totalPage}
             onChange={setCurrentPage}

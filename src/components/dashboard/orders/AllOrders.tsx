@@ -8,13 +8,17 @@ import {
     Skeleton, Spoiler, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import useSearchOrders from "@/hooks/useSearchOrders";
+import usePagination from "@/hooks/usePagination";
 
 const AllOrders = () => {
+
     const clientInstance = useClient()
     const { user } = useUserContext()
     const { companyId } = useParams()
     const isAdmin = user?.role === user_role.admin
+
 
     const { data, isLoading } = useQuery({
         queryKey: ["all-orders", companyId ?? user?.id],
@@ -29,16 +33,26 @@ const AllOrders = () => {
             }),
     })
 
+    const { SearchInput, queryResult,
+        query, dataNotFound, dataFound } = useSearchOrders(data || [])
+    const itemsPerPage = 5;
+    const { PaginationBtn, data: paginatedData } = usePagination((!query ? data : queryResult) || [],
+        itemsPerPage)
+
     const isNotVendor = (user?.role === user_role.admin) || (user?.role === user_role.company)
+
     return (
         <>
             {isLoading && <Flex w={"100%"}>
                 <Skeleton w={"100%"} h={50} />
             </Flex>}
+
+            {!isLoading && <SearchInput />}
+
             <Table
                 striped="even"
                 horizontalSpacing={"md"}
-                verticalSpacing={"md"}
+                verticalSpacing={"xs"}
             >
                 {!isLoading && <Table.Thead >
                     <Table.Tr>
@@ -53,7 +67,7 @@ const AllOrders = () => {
                 </Table.Thead>}
                 <Table.Tbody>
                     {data && data?.length > 0 ? <>
-                        {data.map(item => (
+                        {paginatedData.map(item => (
                             <Table.Tr>
                                 <Table.Td>
                                     <Text size="sm">
@@ -93,8 +107,8 @@ const AllOrders = () => {
                                 </Table.Td>
 
                                 <Table.Td>
-                                        <Badge
-                                            color={item.userPaid ? "green" : "red"}>{item?.userPaid ? "Paid" : "Not Paid"}</Badge>
+                                    <Badge
+                                        color={item.userPaid ? "green" : "red"}>{item?.userPaid ? "Paid" : "Not Paid"}</Badge>
                                 </Table.Td>
 
                                 <Table.Td>
@@ -142,11 +156,16 @@ const AllOrders = () => {
                     </>}
                 </Table.Tbody>
             </Table>
-            {data?.length === 0 &&
-                <Center my={50}>
+
+            {!isLoading && <Center my={dataNotFound ? 50 : 0}>
+                {dataNotFound ?
                     <Text>No data found</Text>
-                </Center>
-            }
+                    :
+                    <>
+                        {dataFound && <PaginationBtn />}
+                    </>
+                }
+            </Center>}
         </>
     );
 }

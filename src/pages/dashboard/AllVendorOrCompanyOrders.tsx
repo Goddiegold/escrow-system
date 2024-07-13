@@ -14,6 +14,7 @@ import BackBtn from "../../components/shared/BackBtn";
 import { useEffect, useState } from "react";
 import usePagination from "@/hooks/usePagination";
 import { useUserContext } from "@/context/UserContext";
+import useSearchOrders from "@/hooks/useSearchOrders";
 
 const AllVendorOrders = () => {
     const clientInstance = useClient()
@@ -24,7 +25,7 @@ const AllVendorOrders = () => {
 
     const queryKey = vendorId ? ["vendor-orders", vendorId] : ["company_orders", companyId]
     const isVendor = user?.role === user_role.vendor
-   
+
     const { data, isLoading } = useQuery({
         queryKey,
         queryFn: () => clientInstance().get(
@@ -70,7 +71,11 @@ const AllVendorOrders = () => {
             })
     }, [selectedOrderStatus])
 
-    const { PaginationBtn, data: paginatedData } = usePagination(data?.result ?? [])
+    const { SearchInput, queryResult,
+        query, dataNotFound, dataFound } = useSearchOrders(data?.result || [])
+    const itemsPerPage = 5;
+    const { PaginationBtn, data: paginatedData } = usePagination((!query ? data?.result : queryResult) || [],
+        itemsPerPage)
 
 
     return (
@@ -93,7 +98,9 @@ const AllVendorOrders = () => {
                         ]} />
                 </Flex>
                 <Card shadow="sm" padding="sm" radius="md" withBorder mih={500} component={ScrollArea}>
-                    {isLoading && <Flex w={"100%"}>
+                    {!isLoading && <SearchInput />}
+                    {isLoading && <Flex w={"100%"} direction={"column"}>
+                        <Skeleton className="w-full lg:w-1/2 2xl:h-2/6" h={30} mb={10} />
                         <Skeleton w={"100%"} h={50} />
                     </Flex>}
                     <Table
@@ -193,14 +200,15 @@ const AllVendorOrders = () => {
                             </>}
                         </Table.Tbody>
                     </Table>
-                    <Center my={50}>
-                        {data?.result?.length === 0 ?
+                    {!isLoading && <Center my={dataNotFound ? 50 : 0}>
+                        {dataNotFound ?
                             <Text>No data found</Text>
                             :
-                            <PaginationBtn />
+                            <>
+                                {dataFound && <PaginationBtn />}
+                            </>
                         }
-
-                    </Center>
+                    </Center>}
                 </Card>
             </Flex>
         </>
