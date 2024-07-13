@@ -3,12 +3,11 @@ import {
     generateRandomNumberString,
     validateRequestBody
 } from '../shared/helpers';
-import { Router, Response } from 'express';
+import { Router, Response, Request } from 'express';
 import { AuthenticatedRequest, IControllerBase, RequestType } from '../shared/types';
 import { requireRole, userAuth } from '../shared/middlewares';
 import { Order, PrismaClient, User, notification_type, order_status, user_role } from '@prisma/client';
 import mailService from '../shared/mailService';
-import { template } from 'handlebars';
 
 export default class OrderController implements IControllerBase {
 
@@ -26,15 +25,23 @@ export default class OrderController implements IControllerBase {
             user_role.vendor])],
             this.getCompanyOrders)
 
-        this.router.get("/all", [userAuth, requireRole([user_role.admin])], this.getCompanyOrders)
+        this.router.get("/all",
+            [userAuth, requireRole([user_role.admin])],
+            this.getCompanyOrders)
 
         this.router.get("/vendor-orders/:vendorId",
-            [userAuth, requireRole([user_role.company, user_role.admin])],
+            [userAuth, requireRole([user_role.company,
+            user_role.admin])],
             this.retrieveVendorOrders)
 
         this.router.get("/:orderId", this.getOrder)
-            .patch("/:orderId", [userAuth, requireRole([user_role.vendor,
-            user_role.company, user_role.admin])], this.updateOrder)
+            .patch("/:orderId", [userAuth,
+                requireRole([user_role.vendor,
+                user_role.company,
+                user_role.admin])],
+                this.updateOrder)
+
+        this.router.get("/order-ref/:orderRef", this.getOrderRef)
 
         this.router.post('/place-order',
             [userAuth, requireRole([user_role.company])],
@@ -53,9 +60,7 @@ export default class OrderController implements IControllerBase {
             let vendors: User[] = [];
 
             const orderRef = `#${generateRandomNumberString(1, 100)}`
-
             const products = req?.body?.products as Record<string, any>[];
-
 
             const vendorEmails = [...new Set(products.map(item => item!.vendor as string))]
 
@@ -77,7 +82,6 @@ export default class OrderController implements IControllerBase {
                     }
                 })
             }
-
 
             for (const item of vendorEmails) {
                 const userExist = await this.prisma.user.findFirst({
@@ -125,65 +129,110 @@ export default class OrderController implements IControllerBase {
                     });
 
                     orders.push(order);
-
-                    await this.prisma.notification.create({
-                        data: {
-                            vendorId: vendor.id,
-                            companyId: req.user?.companyId,
-                            type: notification_type.customer_placed_order,
-                            orderId: order.id,
-                            orderRef,
-                        }
-                    });
                 }
             })
 
-            // await Promise.all(vendors.map(async vendor => {
-            //     const orderProducts = products.filter(((product: object) => {
-            //         //@ts-ignore
-            //         return product!.vendor === vendor.email
-            //     })).map(item => {
-            //         //@ts-ignore
-            //         const { vendor, ...rest } = item;
-            //         return rest
-            //     })
-            //     const order = await this.prisma.order.create({
-            //         data: {
-            //             totalAmount: req?.body?.totalAmount,
-            //             vendorId: vendor.id,
-            //             customerId: customer.id,
-            //             products: orderProducts,
-            //             orderRef,
-            //             companyId: req?.user?.id,
-            //         }
-            //     })
-
-            //     orders.push(order)
-
-            //     await this.prisma.notification.create({
-            //         data: {
-            //             vendorId: vendor?.id,
-            //             companyId: req?.user?.companyId,
-            //             type: notification_type.customer_placed_order,
-            //             orderId: order.id,
-            //             orderRef,
-            //         }
-            //     })
-            // }))
-
-            // vendorEmails.map(async email => {
-            //     const currentVendor = vendors?.find(vendor => vendor.email === email)
-            //     mailService({
-            //         subject: "An order has been placed",
-            //         email: currentVendor?.email,
-            //         template: "forgotPassword",
-            //         name: currentVendor?.email,
-            //         url: `${process.env.FRONTEN_URL}/login?redirect=/dashboard/orders/pending-deliveries`
-            //     })
-            // })
-
             return res.status(201).json({ result: orders })
 
+        } catch (error) {
+            return res.status(500).json(errorMessage(error, true))
+        }
+    }
+
+    payForOrder = async (req: Request, res: Response) => {
+        try {
+            const orderRef = req?.params?.orderRef;
+            const transactionRef = req?.query?.transactionRef as string;
+
+            const order = await this.prisma.order.findMany({
+                where: {
+                    orderRef,
+                    // userPaid: false
+                },
+            })
+
+            if (!order || order?.length === 0) return res.status(404).json({ message: "Order not found!" })
+
+            await this.prisma.order.updateMany({
+                where: { orderRef },
+                data: {
+                    transactionRef
+                }
+            })
+
+            return res.status(200).json({ message: "Updated record successfully!" })
+        } catch (error) {
+            return res.status(500).json(errorMessage(error, true))
+        }
+    }
+
+    verifyOrderPaymentStatus = async (req: Request, res: Response) => {
+        try {
+            const orderRef = req?.params?.orderRef;
+            const transactionRef = req?.query?.transactionRef as string;
+
+            const orders = await this.prisma.order.findMany({
+                include: {
+                    customer: { select: { name: true, email: true, } },
+                    vendor: { select: { name: true, email: true } },
+                    company: { select: { name: true } }
+                },
+                where:
+                {
+                    orderRef,
+                    transactionRef,
+                    // userPaid: false
+                }
+            })
+
+            if (!orders || orders?.length === 0) return res.status(404).json({ message: "Order not found!" })
+
+            //call paystack api first to verify payment
+
+            await this.prisma.order.updateMany({
+                where: {
+                    orderRef
+                },
+                data: {
+                    userPaid: true,
+                    userPaidOn: new Date()
+                }
+            })
+
+            for (const order of orders) {
+                await this.prisma.notification.create({
+                    data: {
+                        vendorId: order.vendorId,
+                        companyId: order?.companyId,
+                        type: notification_type.customer_placed_order,
+                        orderId: order.id,
+                        orderRef,
+                    }
+                });
+
+                mailService({
+                    subject: "An order has been placed on your store",
+                    email: order?.vendor?.email,
+                    customer: order?.customer?.name,
+                    company: order.company?.name,
+                    template: "orderPlacedOnStore",
+                    name: order?.vendor?.name,
+                    url: `${process.env.FRONTEND_URL}/login?redirect=/dashboard/orders/pending-deliveries`
+                })
+            }
+
+
+            const customer = orders[0].customer;
+            const company = orders[0].company;
+
+            mailService({
+                subject: "Order placed successfully",
+                email: customer!.email,
+                orderRef,
+                template: "orderPlaced",
+                name: customer!.name,
+                companyName: company?.name,
+            })
         } catch (error) {
             return res.status(500).json(errorMessage(error, true))
         }
@@ -229,7 +278,7 @@ export default class OrderController implements IControllerBase {
                     customer: { select: { id: true, name: true, email: true, } },
                     company: { select: { id: true, name: true, email: true } }
                 },
-                where: { ...filter }
+                where: { ...filter, userPaid: true }
             })
             return res.status(200).json({ result })
         } catch (error) {
@@ -251,6 +300,24 @@ export default class OrderController implements IControllerBase {
                 return res.status(404).json({ message: "Order Not Found!" })
             }
             return res.status(200).json({ result })
+        } catch (error) {
+            return res.status(500).json(errorMessage(error))
+        }
+    }
+
+    getOrderRef = async (req: Request, res: Response) => {
+        try {
+            const orderRef = "#" + req?.params?.orderRef as string;
+
+            const orders = await this.prisma.order.findMany({
+                select: { totalAmount: true },
+                where: {
+                    orderRef,
+                    // userPaid:false
+                }
+            })
+
+            return res.status(200).json({ result: orders })
         } catch (error) {
             return res.status(500).json(errorMessage(error))
         }
@@ -329,7 +396,7 @@ export default class OrderController implements IControllerBase {
                         name: updateOrder.customer?.name,
                         vendor: updateOrder.vendor?.name
                     })
-                }else{
+                } else {
                     mailService({
                         subject: `Order ${updateOrder.orderRef} has been cancelled`,
                         email: updateOrder.customer?.email,
@@ -389,7 +456,8 @@ export default class OrderController implements IControllerBase {
                 },
                 where: {
                     vendorId,
-                    ...filter
+                    ...filter,
+                    userPaid: true,
                 }
             })
             return res.status(200).json({ result })
@@ -445,12 +513,6 @@ export default class OrderController implements IControllerBase {
         }
     }
 
-    // confirmOrderAuth = async (req: AuthenticatedRequest, res: Response) => {
-    //     try {
 
-    //     } catch (error) {
-
-    //     }
-    // }
 
 }

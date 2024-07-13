@@ -70,6 +70,7 @@ model Order {
   companyId         String?        @db.ObjectId
   order_status      order_status   @default(pending)
   orderRef          String?
+  transactionRef    String?
   notifications     Notification[]
   products          Json[]
   totalAmount       Float?
