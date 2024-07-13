@@ -97,7 +97,7 @@ const Login = () => {
                 <Text style={{ textAlign: "center" }} size="sm">
                     Don't have an account yet?{" "}
                     <Link
-                        to={!companySlug ? "/register" : `/register/${companySlug}`}
+                        to={!companySlug ? "/register" : `/${companySlug}/register`}
                         className="font-bold text-blue-400 no-underline"
                     >
                         Sign Up

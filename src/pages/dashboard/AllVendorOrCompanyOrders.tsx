@@ -100,6 +100,7 @@ const AllVendorOrders = () => {
                     >
                         {!isLoading && <Table.Thead >
                             <Table.Tr>
+                                <Table.Th>Ref./ID</Table.Th>
                                 <Table.Th>Customer</Table.Th>
                                 <Table.Th>Product</Table.Th>
                                 <Table.Th>Delivered</Table.Th>
@@ -110,6 +111,11 @@ const AllVendorOrders = () => {
                             {data?.result && data?.result?.length > 0 ? <>
                                 {paginatedData.map(item => (
                                     <Table.Tr>
+                                        <Table.Td>
+                                            <Text size="sm">
+                                                {item.orderRef}
+                                            </Text>
+                                        </Table.Td>
                                         <Table.Td>
                                             <Flex direction={"column"}>
                                                 <Text fz="sm">{item?.customer?.name}</Text>

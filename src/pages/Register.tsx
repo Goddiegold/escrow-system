@@ -83,7 +83,7 @@ const Register = () => {
             bottomContent={<>
                 <Text style={{ textAlign: "center" }} size="sm">Already have an account ?
                     {" "}
-                    <Link to={!companySlug ? '/login' : `/login/jumia`}
+                    <Link to={!companySlug ? '/login' : `/${companySlug}/login`}
                         className="font-bold text-blue-400 no-underline">
                         Login
                     </Link>

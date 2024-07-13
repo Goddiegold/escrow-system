@@ -80,11 +80,11 @@ const router = createBrowserRouter([
                 element: <Register />,
             },
             {
-                path: "/login/:companySlug",
+                path: "/:companySlug/login",
                 element: <Login />,
             },
             {
-                path: "/register/:companySlug",
+                path: "/:companySlug/register",
                 element: <Register />,
             },
             {

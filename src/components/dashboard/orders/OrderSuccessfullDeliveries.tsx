@@ -91,6 +91,7 @@ const SuccessfullPendingDeliveries = () => {
             >
                 {!isLoading && <Table.Thead >
                     <Table.Tr>
+                        <Table.Th>Ref./ID</Table.Th>
                         <Table.Th>Customer</Table.Th>
                         {isNotVendor && <Table.Th>Vendor</Table.Th>}
                         <Table.Th>Product</Table.Th>
@@ -102,6 +103,11 @@ const SuccessfullPendingDeliveries = () => {
                     {data?.result && data?.result.length > 0 ? <>
                         {data.result.map(item => (
                             <Table.Tr>
+                                <Table.Td>
+                                    <Text size="sm">
+                                        {item.orderRef}
+                                    </Text>
+                                </Table.Td>
                                 <Table.Td>
                                     <Flex direction={"column"}>
                                         <Text fz="sm">{item?.customer?.name}</Text>
@@ -150,7 +156,7 @@ const SuccessfullPendingDeliveries = () => {
 
                                 <Table.Td>
                                     <Badge color={item.userReceived ? "green" : "orange"}>
-                                    {item.userReceived ? "success" : "pending"}
+                                        {item.userReceived ? "success" : "pending"}
                                     </Badge>
                                 </Table.Td>
 

@@ -69,6 +69,11 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
     return (
         <Table.Tr>
             <Table.Td>
+                <Text size="sm">
+                    {item.orderRef}
+                </Text>
+            </Table.Td>
+            <Table.Td>
                 <Flex direction={"column"}>
                     <Text fz="sm">{item?.customer?.name}</Text>
                     <Text fz={"xs"} c={"dimmed"}>{item.customer?.email}</Text>
@@ -174,6 +179,7 @@ const OrderPendingDeliveries = () => {
             >
                 {!isLoading && <Table.Thead >
                     <Table.Tr>
+                        <Table.Th>Ref./ID</Table.Th>
                         <Table.Th>Customer</Table.Th>
                         {isNotVendor && <Table.Th>Vendor</Table.Th>}
                         <Table.Th>Product</Table.Th>

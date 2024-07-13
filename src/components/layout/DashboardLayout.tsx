@@ -61,7 +61,7 @@ export default function DashboardLayout() {
                             <Flex direction={"row"} justify={"space-between"}>
                                 <Text my={10} fw={600} size='lg' c="dark">Hi there {user?.name} 👋, welcome 😁</Text>
                                 {isLoggedIn && user?.role === user_role.company ?
-                                    <CopyButton value={`${window.origin}/register/${user?.company?.slug}`}>
+                                    <CopyButton value={`${window.origin}/${user?.company?.slug}/register/`}>
                                         {({ copied, copy }) => (
                                             <Tooltip label="Unique registration link For your vendors" withArrow>
                                                 <Button color={copied ? 'teal' : 'blue'} onClick={copy}>

@@ -1,5 +1,5 @@
 import {
-    ActionIcon, Avatar, Burger, Button, Flex, Group, Menu,
+    ActionIcon, Avatar, Burger, Button, Flex, Group, Indicator, Menu,
     Text, Tooltip, useMantineColorScheme
 } from "@mantine/core";
 import Logo from "./Logo";
@@ -8,6 +8,8 @@ import { getInitials, menuData } from "@/shared/helpers";
 import { IoMdLogOut } from "react-icons/io";
 import { useUserContext } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
+import { useClient } from "@/shared/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface DashboardHeaderProps {
     mobileOpened: boolean,
@@ -20,6 +22,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
         const { colorScheme, toggleColorScheme } = useMantineColorScheme();
         const dark = colorScheme === 'dark';
         const navigate = useNavigate()
+        const { user } = useUserContext()
+
+        const queryKey = ["notifications", user?.id]
+        const clientInstance = useClient()
 
         const MenuOptions = () => {
             return (<>
@@ -30,7 +36,20 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                 ))}
             </>)
         }
-        const { user } = useUserContext()
+
+        const { isLoading, isRefetching, data } = useQuery({
+            queryKey,
+            queryFn: async () => {
+                try {
+                    const response = await clientInstance().get("/users/notifications")
+                    return response.data?.result as [];
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+            // refetchOnMount: "always",
+            refetchInterval: 1200000,
+        })
 
         return (
             <Group h="100%" px="md" justify="space-between">
@@ -42,7 +61,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                             <ActionIcon
                                 size={'lg'}
                                 radius={10}
-                                mx={5}
+                                // mx={5}
                                 variant="outline"
                                 color='gray'
                                 onClick={() => toggleColorScheme()}
@@ -54,15 +73,20 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
 
                         <ActionIcon
                             onClick={() => navigate("/dashboard/notifications")}
-                            size={'lg'}
-                            radius={10}
-                            mx={5}
+                            size={'xl'}
                             variant="transparent"
                             // variant="outline"
                             color='gray'
-                            title="Toggle color scheme"
+                            title="Notifications"
                         >
-                            <Bell size={25} />
+                            <Indicator
+                                radius={"xl"}
+                                position='top-end'
+                                color="red"
+                                disabled={!data || data?.length == 0}
+                                processing={isRefetching || isLoading || data?.length > 1}>
+                                <Bell size={25} weight='fill' />
+                            </Indicator>
                         </ActionIcon>
                     </Flex>
 
@@ -72,6 +96,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                                 maw={300}
                                 mih={60}
                                 p={0}
+                                m={0}
                                 className="-mr-[20px] md:mr-0"
                                 variant="transparent"
                                 rightSection={<CaretRight size={20} color='gray' className='hidden md:block' />}>

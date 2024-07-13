@@ -18,7 +18,7 @@ const useQueryURL = () => {
 const Orders = () => {
     const navigate = useNavigate();
     const { tabValue, vendorId } = useParams();
-    const iconStyle = { width: rem(15), height: rem(15) };
+    const iconStyle = { width: rem(20), height: rem(20) };
     // const queryURL = useQueryURL();
 
     return (

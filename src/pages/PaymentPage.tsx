@@ -2,7 +2,7 @@ import Logo from "@/components/shared/Logo";
 import client, { useClient } from "@/shared/client";
 import { calculateServiceFee, toast } from "@/shared/helpers";
 import { Button, Divider, Flex, LoadingOverlay, NumberFormatter, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate, useParams } from "react-router-dom";
 import { PaystackConsumer } from "react-paystack";
@@ -15,7 +15,7 @@ const PaymentPage = () => {
     const clientInstance = useClient()
     const navigate = useNavigate()
     const paymentRef = `orderPayment_${uuidv4()}`;
-    console.log('Order Reference:', orderRef);
+    const queryClient = useQueryClient()
     const [loading, setLoading] = useState(false)
 
     const { data,
@@ -69,8 +69,12 @@ const PaymentPage = () => {
             //verify payment
             client().get(`/orders/verify-payment/${orderRef}?transactionRef=${response?.reference}`)
                 .then(res => {
+                    queryClient.setQueryData(["orderRef", orderRef], (data: Order[] | null) => {
+                        if (!data) return;
+                        return data.map(item => ({ ...item, userPaid: true }))
+                    })
                     setLoading(false)
-                    toast("You would be contacted by the event planner soon!",
+                    toast("You would be updated via mail!",
                         'Payment Successful!').success()
                 }).catch(err => {
                     setLoading(false)
