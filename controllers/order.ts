@@ -42,6 +42,8 @@ export default class OrderController implements IControllerBase {
                 this.updateOrder)
 
         this.router.get("/order-ref/:orderRef", this.getOrderRef)
+        this.router.get("/init-payment/:orderRef", this.payForOrder)
+        this.router.get("/verify-payment/:orderRef", this.verifyOrderPaymentStatus)
 
         this.router.post('/place-order',
             [userAuth, requireRole([user_role.company])],
@@ -141,17 +143,21 @@ export default class OrderController implements IControllerBase {
 
     payForOrder = async (req: Request, res: Response) => {
         try {
-            const orderRef = req?.params?.orderRef;
+            const orderRef = "#" + req?.params?.orderRef as string;
             const transactionRef = req?.query?.transactionRef as string;
 
-            const order = await this.prisma.order.findMany({
+            const orders = await this.prisma.order.findMany({
                 where: {
                     orderRef,
                     // userPaid: false
                 },
             })
 
-            if (!order || order?.length === 0) return res.status(404).json({ message: "Order not found!" })
+            if (!orders || orders?.length === 0) return res.status(404).json({ message: "Order not found!" })
+
+            if (orders[0]?.userPaid) {
+                return res.status(400).json({ message: "This order has been paid for already!" })
+            }
 
             await this.prisma.order.updateMany({
                 where: { orderRef },
@@ -160,7 +166,10 @@ export default class OrderController implements IControllerBase {
                 }
             })
 
-            return res.status(200).json({ message: "Updated record successfully!" })
+            return res.status(200).json({
+                message: "Updated record successfully!",
+                result: { transactionRef }
+            })
         } catch (error) {
             return res.status(500).json(errorMessage(error, true))
         }
@@ -168,14 +177,14 @@ export default class OrderController implements IControllerBase {
 
     verifyOrderPaymentStatus = async (req: Request, res: Response) => {
         try {
-            const orderRef = req?.params?.orderRef;
+            const orderRef = "#" + req?.params?.orderRef as string;
             const transactionRef = req?.query?.transactionRef as string;
 
             const orders = await this.prisma.order.findMany({
                 include: {
                     customer: { select: { name: true, email: true, } },
                     vendor: { select: { name: true, email: true } },
-                    company: { select: { name: true } }
+                    company: { select: { name: true, slug: true } }
                 },
                 where:
                 {
@@ -217,7 +226,7 @@ export default class OrderController implements IControllerBase {
                     company: order.company?.name,
                     template: "orderPlacedOnStore",
                     name: order?.vendor?.name,
-                    url: `${process.env.FRONTEND_URL}/login?redirect=/dashboard/orders/pending-deliveries`
+                    url: `${process.env.FRONTEND_URL}/${order?.company?.slug}/login?redirect=/dashboard/orders/pending-deliveries`
                 })
             }
 
@@ -233,6 +242,8 @@ export default class OrderController implements IControllerBase {
                 name: customer!.name,
                 companyName: company?.name,
             })
+
+            return res.status(200).json({ message: "Payment verified successfully!" })
         } catch (error) {
             return res.status(500).json(errorMessage(error, true))
         }
@@ -310,7 +321,11 @@ export default class OrderController implements IControllerBase {
             const orderRef = "#" + req?.params?.orderRef as string;
 
             const orders = await this.prisma.order.findMany({
-                select: { totalAmount: true },
+                select: {
+                    totalAmount: true,
+                    customer: { select: { email: true, name: true } },
+                    userPaid: true,
+                },
                 where: {
                     orderRef,
                     // userPaid:false
