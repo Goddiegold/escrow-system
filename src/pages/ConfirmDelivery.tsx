@@ -54,15 +54,17 @@ const ConfirmDelivery = () => {
         overlayProps={{ radius: "sm", blur: 2 }} />
       <Flex
         align={'center'}
-        maw={500}
+        maw={600}
         mx={"auto"}
         my={"auto"}
         direction={'column'}
         justify={'center'} mah={'100vh'}
+        className="border shadow-sm rounded-3xl"
         p={20}>
         <Logo />
 
-        {currentOrder && !currentOrder?.userReceived ? <Flex my={20} direction={'column'}>
+        {currentOrder
+          && !currentOrder?.userReceived ? <Flex my={20} direction={'column'} w={"95%"}>
           <Text fw={500} size={"xl"} ta={"center"} mb={10}>Hi there 👋</Text>
           <Text fw={400}
           >
@@ -86,9 +88,8 @@ const ConfirmDelivery = () => {
                 })} />
           </Flex>
 
-          <Flex className="flex flex-col sm:flex-row" my={10} align={"center"} justify={"center"}>
-            <Button color="dark" fw={400}>No (I haven't received the order)</Button>
-            <Space mx={"xs"} />
+          <Flex className="flex flex-col sm:flex-row" my={10} justify={"space-between"}>
+            <Button color="dark" fw={400} className="mb-[10px] sm:mb-0">No (I haven't received the order)</Button>
             <Popover width={200} position="bottom" withArrow shadow="md">
               <Popover.Target>
                 <Button color="red" fw={400}>Yes (I have received the order)</Button>

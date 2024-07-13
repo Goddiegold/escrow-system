@@ -101,3 +101,10 @@ export const menuData = [
     },
 ];
 
+export const calculateServiceFee = (totalAmount: number) => {
+    if (totalAmount < 10000) { //lesser than 10k
+        return 50
+    }else{
+        return 1000 //more than 10k
+    }
+}

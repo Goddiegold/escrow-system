@@ -13,6 +13,7 @@ import AllVendorOrCompanyOrders from "./pages/dashboard/AllVendorOrCompanyOrders
 import RegisteredCompanies from "./pages/dashboard/RegisteredCompanies";
 import ConfirmDelivery from "./pages/ConfirmDelivery";
 import NotificationsPage from "./pages/dashboard/NotificationsPage";
+import PaymentPage from "./pages/PaymentPage";
 
 const router = createBrowserRouter([
     {
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
             {
                 path: "/confirm-delivery/:orderId",
                 element: <ConfirmDelivery />
+            },
+            {
+                path: "/payment/:orderRef",
+                element: <PaymentPage />
             }
         ]
     },
