@@ -253,7 +253,7 @@ export default class OrderController implements IControllerBase {
         try {
             const companyId = req?.params?.companyId;
             const status = req?.query?.status as order_status;
-            const filter = {};
+            const filter:Record<string, any> = {};
 
             if (status) {
                 const statusValue = (status === order_status.pending || status === order_status.delivered) ? status : undefined;
@@ -261,12 +261,10 @@ export default class OrderController implements IControllerBase {
                     return res.status(400).json({ message: "Something went wrong!" })
                 }
 
-                //@ts-ignore
                 filter["order_status"] = statusValue;
             }
 
             if (req.user?.role === user_role.company || req?.user?.role === user_role.vendor) {
-                //@ts-ignore
                 filter["companyId"] = companyId;
 
                 if (req?.user.companyId !== companyId) {
@@ -275,8 +273,8 @@ export default class OrderController implements IControllerBase {
 
                 const isVendor = req?.user?.role === user_role.vendor;
                 if (isVendor) {
-                    //@ts-ignore
                     filter["vendorId"] = req?.user?.id;
+                    filter["userPaid"] = true;
                 }
             }
 
@@ -289,7 +287,7 @@ export default class OrderController implements IControllerBase {
                     customer: { select: { id: true, name: true, email: true, } },
                     company: { select: { id: true, name: true, email: true } }
                 },
-                where: { ...filter, userPaid: true }
+                where: { ...filter, }
             })
             return res.status(200).json({ result })
         } catch (error) {
@@ -472,7 +470,7 @@ export default class OrderController implements IControllerBase {
                 where: {
                     vendorId,
                     ...filter,
-                    userPaid: true,
+                    // userPaid: true,
                 }
             })
             return res.status(200).json({ result })
