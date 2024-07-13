@@ -90,9 +90,11 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
                     className="text-color-1 text-xs underline">more orders</Link> */}
             </Table.Td>}
 
-            <Table.Td maw={500}>
-                <Flex direction={"column"} >
-                    <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide">
+            <Table.Td>
+                <Flex direction={"column"} w={200}>
+                    <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide" classNames={{
+                        control: "text-xs"
+                    }}>
                         <List listStyleType="disc">
                             {item.products.map(item => (
                                 <List.Item >
@@ -181,8 +183,8 @@ const OrderPendingDeliveries = () => {
                     <Table.Tr>
                         <Table.Th>Ref./ID</Table.Th>
                         <Table.Th>Customer</Table.Th>
-                        {isNotVendor && <Table.Th>Vendor</Table.Th>}
                         <Table.Th>Product</Table.Th>
+                        {isNotVendor && <Table.Th>User Paid</Table.Th>}
                         <Table.Th>Delivered</Table.Th>
                         <Table.Th>Customer Confirmed</Table.Th>
                     </Table.Tr>

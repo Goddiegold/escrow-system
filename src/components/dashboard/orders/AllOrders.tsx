@@ -46,6 +46,7 @@ const AllOrders = () => {
                         <Table.Th>Customer</Table.Th>
                         {isNotVendor && <Table.Th>Vendor</Table.Th>}
                         <Table.Th>Product</Table.Th>
+                        {isNotVendor && <Table.Th>User Paid</Table.Th>}
                         <Table.Th>Delivered</Table.Th>
                         <Table.Th>Customer Confirmed</Table.Th>
                     </Table.Tr>
@@ -71,13 +72,15 @@ const AllOrders = () => {
                                     <Text fz={"xs"} c={"dimmed"}>{item?.vendor?.email}</Text>
                                 </Table.Td>}
 
-                                <Table.Td maw={500}>
-                                    <Flex direction={"column"} >
-                                        <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide">
-                                            <List listStyleType="disc">
+                                <Table.Td>
+                                    <Flex direction={"column"} w={200}>
+                                        <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide" classNames={{
+                                            control: "text-xs"
+                                        }}>
+                                            <List listStyleType="disc" >
                                                 {item.products.map(item => (
                                                     <List.Item >
-                                                        <Text size="sm">id: {item.id}, name: {item.name}, amount: <NumberFormatter
+                                                        <Text size="sm">id: {item.id}, name: {item.name}, price: <NumberFormatter
                                                             thousandSeparator
                                                             prefix="₦"
                                                             value={item.price} /></Text>
@@ -87,6 +90,11 @@ const AllOrders = () => {
                                             </List>
                                         </Spoiler>
                                     </Flex>
+                                </Table.Td>
+
+                                <Table.Td>
+                                        <Badge
+                                            color={item.userPaid ? "green" : "red"}>{item?.userPaid ? "Paid" : "Not Paid"}</Badge>
                                 </Table.Td>
 
                                 <Table.Td>

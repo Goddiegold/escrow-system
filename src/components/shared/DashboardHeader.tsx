@@ -10,6 +10,7 @@ import { useUserContext } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useClient } from "@/shared/client";
 import { useQuery } from "@tanstack/react-query";
+import { user_role } from "@/shared/types";
 
 interface DashboardHeaderProps {
     mobileOpened: boolean,
@@ -23,7 +24,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
         const dark = colorScheme === 'dark';
         const navigate = useNavigate()
         const { user } = useUserContext()
-
+        const isAdmin = user?.role === user_role.admin
         const queryKey = ["notifications", user?.id]
         const clientInstance = useClient()
 
@@ -49,6 +50,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
             },
             // refetchOnMount: "always",
             refetchInterval: 1200000,
+            enabled: !isAdmin,
         })
 
         return (
@@ -71,7 +73,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                             </ActionIcon>
                         </Tooltip>
 
-                        <ActionIcon
+                        {!isAdmin && <ActionIcon
                             onClick={() => navigate("/dashboard/notifications")}
                             size={'xl'}
                             variant="transparent"
@@ -84,10 +86,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                                 position='top-end'
                                 color="red"
                                 disabled={!data || data?.length == 0}
-                                processing={isRefetching || isLoading || data?.length > 1}>
+                                processing={isRefetching || isLoading || (data && data?.length > 1)}>
                                 <Bell size={25} weight='fill' />
                             </Indicator>
-                        </ActionIcon>
+                        </ActionIcon>}
                     </Flex>
 
                     <Menu shadow="md" width={200}>

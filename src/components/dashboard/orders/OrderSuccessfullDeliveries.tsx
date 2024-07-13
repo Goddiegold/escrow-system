@@ -127,9 +127,11 @@ const SuccessfullPendingDeliveries = () => {
                                 </Table.Td>}
 
 
-                                <Table.Td maw={500}>
-                                    <Flex direction={"column"} >
-                                        <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide">
+                                <Table.Td>
+                                    <Flex direction={"column"} w={200}>
+                                        <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide" classNames={{
+                                            control: "text-xs"
+                                        }}>
                                             <List listStyleType="disc">
                                                 {item.products.map(item => (
                                                     <List.Item >

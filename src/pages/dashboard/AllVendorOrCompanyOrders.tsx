@@ -1,7 +1,7 @@
 import { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Order as OrderType, order_status } from "@/shared/types";
+import { Order as OrderType, order_status, user_role } from "@/shared/types";
 import {
     Badge, Card, Center, Flex, List, NumberFormatter,
     ScrollArea,
@@ -13,16 +13,18 @@ import { useParams } from "react-router-dom";
 import BackBtn from "../../components/shared/BackBtn";
 import { useEffect, useState } from "react";
 import usePagination from "@/hooks/usePagination";
+import { useUserContext } from "@/context/UserContext";
 
 const AllVendorOrders = () => {
     const clientInstance = useClient()
     const { vendorId, companyId } = useParams()
     const [selectedOrderStatus, setSelectedOrderStatus] = useState<order_status | "all">("all")
     const queryClient = useQueryClient()
+    const { user } = useUserContext()
 
     const queryKey = vendorId ? ["vendor-orders", vendorId] : ["company_orders", companyId]
-    console.log("vendorId", vendorId)
-    console.log("companyId", companyId)
+    const isVendor = user?.role === user_role.vendor
+   
     const { data, isLoading } = useQuery({
         queryKey,
         queryFn: () => clientInstance().get(
@@ -70,6 +72,7 @@ const AllVendorOrders = () => {
 
     const { PaginationBtn, data: paginatedData } = usePagination(data?.result ?? [])
 
+
     return (
         <>
             <Flex direction={"column"}>
@@ -103,6 +106,7 @@ const AllVendorOrders = () => {
                                 <Table.Th>Ref./ID</Table.Th>
                                 <Table.Th>Customer</Table.Th>
                                 <Table.Th>Product</Table.Th>
+                                {!isVendor && <Table.Th>User Paid</Table.Th>}
                                 <Table.Th>Delivered</Table.Th>
                                 <Table.Th>Customer Confirmed</Table.Th>
                             </Table.Tr>
@@ -123,8 +127,8 @@ const AllVendorOrders = () => {
                                             </Flex>
                                         </Table.Td>
 
-                                        <Table.Td maw={500}>
-                                            <Flex direction={"column"} >
+                                        <Table.Td >
+                                            <Flex direction={"column"} w={200}>
                                                 <Spoiler maxHeight={40} showLabel="Show more" hideLabel="Hide">
                                                     <List listStyleType="disc">
                                                         {item.products.map(item => (
@@ -140,7 +144,10 @@ const AllVendorOrders = () => {
                                                 </Spoiler>
                                             </Flex>
                                         </Table.Td>
-
+                                        <Table.Td>
+                                            <Badge
+                                                color={item.userPaid ? "green" : "red"}>{item?.userPaid ? "Paid" : "Not Paid"}</Badge>
+                                        </Table.Td>
                                         <Table.Td>
                                             {(item.order_status === order_status.pending) ||
                                                 (item.order_status === order_status.delivered) ?

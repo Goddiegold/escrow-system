@@ -94,6 +94,7 @@ const NotificationsPage = () => {
     const { user } = useUserContext()
     const clientInstance = useClient()
     const queryKey = ["notifications", user?.id]
+    const isAdmin = user?.role === user_role.admin
 
     const { data, isLoading, refetch: refetchNotifications, isRefetching } = useQuery({
         queryKey,
@@ -107,6 +108,7 @@ const NotificationsPage = () => {
         },
         // refetchOnMount: "always",
         refetchInterval: 1200000,
+        enabled: !isAdmin,
     })
 
     const isFetching = isLoading || isRefetching;
