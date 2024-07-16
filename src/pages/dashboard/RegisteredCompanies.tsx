@@ -46,6 +46,7 @@ const RegisteredCompanies = () => {
                                     <Table.Th>Name</Table.Th>
                                     <Table.Th>Registered On</Table.Th>
                                     <Table.Th></Table.Th>
+                                    <Table.Th></Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
                             <Table.Tbody>
@@ -64,6 +65,13 @@ const RegisteredCompanies = () => {
                                                         variant="transparent"
                                                         onClick={() => navigate(`/dashboard/company-orders/${item.id}`)}>
                                                         Orders
+                                                    </Button>
+                                                </Table.Td>
+                                                <Table.Td>
+                                                    <Button
+                                                        variant="transparent"
+                                                        onClick={() => navigate(`/dashboard/registered-vendors/${item.id}`)}>
+                                                        Vendors
                                                     </Button>
                                                 </Table.Td>
                                             </Table.Tr>

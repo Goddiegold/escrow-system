@@ -30,6 +30,10 @@ const router = createBrowserRouter([
                 element: <RegisteredVendors />
             },
             {
+                path: "/dashboard/registered-vendors/:companyId",
+                element: <RegisteredVendors />
+            },
+            {
                 path: "/dashboard/registered-companies",
                 element: <RegisteredCompanies />
             },

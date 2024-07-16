@@ -50,7 +50,7 @@ const useSearchOrders = (orders: Order[]) => {
                 <X color="gray" />
             </ActionIcon>
         }
-        className="w-full lg:w-[50%] 2xl:w-[20%]"
+        className="w-[200px] sm:w-[400px] lg:w-[50%] 2xl:w-[20%] "
         value={query}
         autoFocus
         onChange={e => setQuery(e.target.value)}

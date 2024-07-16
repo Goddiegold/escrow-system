@@ -1,11 +1,12 @@
 import BackBtn from "@/components/shared/BackBtn";
 import { useUserContext } from "@/context/UserContext";
+import usePagination from "@/hooks/usePagination";
 import { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
 import { User, user_role } from "@/shared/types";
-import { Card, Flex, Select, Skeleton, Table } from "@mantine/core";
+import { Card, Center, Flex, Select, Skeleton, Table, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const elements = [
     { position: 6, mass: 12.011, symbol: 'C', name: 'Carbon' },
@@ -19,10 +20,11 @@ const RegisteredVendors = () => {
     const { user } = useUserContext()
     const isAdmin = user?.role === user_role.admin;
     const clientInstance = useClient();
+    const { companyId } = useParams()
 
     const { data, isLoading } = useQuery({
-        queryKey: ["registered-vendors", user?.id],
-        queryFn: () => clientInstance().get(`/companies/get-users?role=${user_role.vendor}`)
+        queryKey: ["registered-vendors", companyId || user?.id],
+        queryFn: () => clientInstance().get(!companyId ? `/companies/get-users?role=${user_role.vendor}` : `/companies/get-users?role=${user_role.vendor}&&companyId=${companyId}`)
             .then(res => res?.data?.result as User[])
             .catch(err => {
                 toast(err?.reponse?.data?.messsage).error()
@@ -30,11 +32,13 @@ const RegisteredVendors = () => {
             })
     })
 
+    const { PaginationBtn, data: paginatedData } = usePagination(data || [])
+
     return (
         <Flex direction={"column"}>
             <Flex my={10} align={"center"} justify={"space-between"}>
                 <BackBtn />
-              
+
             </Flex>
             <Card shadow="sm" padding="sm" radius="md" withBorder>
                 {isLoading && <Flex w={"100%"}>
@@ -52,7 +56,7 @@ const RegisteredVendors = () => {
                     </Table.Thead>}
                     <Table.Tbody>
                         {data && data?.length > 0 ? <>
-                            {data.map(item => (
+                            {paginatedData.map(item => (
                                 <Table.Tr>
                                     <Table.Td>
                                         {item.name}
@@ -86,6 +90,14 @@ const RegisteredVendors = () => {
                         </>}
                     </Table.Tbody>
                 </Table>
+                <Center my={30}>
+                    {data?.length === 0 ? <Text>No data found</Text> :
+                        <>
+                            <PaginationBtn />
+                        </>
+                    }
+
+                </Center>
             </Card>
         </Flex>
     );

@@ -6,7 +6,7 @@ import { Order as OrderType, order_status, user_role } from "@/shared/types";
 import {
     Badge, Center, Flex, List, NumberFormatter,
     Select,
-    Skeleton, Spoiler, Table, Text
+    Skeleton, Space, Spoiler, Table, Text
 } from "@mantine/core";
 import AppSkeleton from "@/components/AppSkeleton";
 import { Link, useParams } from "react-router-dom";
@@ -80,8 +80,10 @@ const SuccessfullPendingDeliveries = () => {
             {isLoading && <Flex w={"100%"}>
                 <Skeleton w={"100%"} h={50} />
             </Flex>}
-            {!isLoading && <SearchInput />}
-            <Flex justify={"flex-end"}>
+            {/* {!isLoading && <SearchInput />} */}
+            {!isLoading && <Flex align={"center"} justify={"space-between"} my={10} className="flex flex-col lg:flex-row" px={10}>
+                <SearchInput mt={30} />
+
                 <Select
                     value={orderStatus}
                     onChange={setOrderStatus}
@@ -92,7 +94,7 @@ const SuccessfullPendingDeliveries = () => {
                         { label: "Delivery Confirmed", value: order_status.delivery_confirmed },
                         { label: "Pending Confirmation", value: order_status.pending_confirmation }
                     ]} />
-            </Flex>
+            </Flex>}
             <Table
                 striped="even"
                 horizontalSpacing={"md"}
