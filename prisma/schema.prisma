@@ -36,6 +36,7 @@ model User {
   otp           String? //one time link
   otpDuration   DateTime? //one time link
   phone         String?
+  address       String?
 
   vendorOrders   Order[] @relation("vendorOrders") //belongs to the vendor
   customerOrders Order[] @relation("customerOrders") //belongs to the customer

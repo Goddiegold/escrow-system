@@ -29,11 +29,12 @@ export default class UserController implements IControllerBase {
         this.router.post('/register', this.register)
         this.router.get('/profile', userAuth, this.getProfile)
         this.router.post("/reset-password-1", this.resetPassword1)
-        this.router.put("/reset-password-3/:otl", this.resetPassword3)
+        this.router.put("/reset-password-2/:otl", this.resetPassword3)
         this.router.put("/update-profile", userAuth, this.updateProfile)
         this.router.put("/update-password", userAuth, this.updatePassword)
         this.router.get("/notifications", [userAuth, requireRole([user_role.company, user_role.vendor])], this.getNotifications)
-        this.router.put("/notifications/:notificationId", [userAuth, requireRole([user_role.company, user_role.vendor])], this.markNotificationAsRead)
+        this.router.put("/notifications/:notificationId",
+            [userAuth, requireRole([user_role.company, user_role.vendor])], this.markNotificationAsRead)
     }
 
     login = async (req: Request, res: Response) => {
@@ -181,6 +182,7 @@ export default class UserController implements IControllerBase {
     updateProfile = async (req: AuthenticatedRequest, res: Response) => {
         try {
             const userId = req.user?.id;
+            const body = req?.body as Record<string, string>;
 
             const userExists = await this.prisma.user.findFirst({
                 where: {
@@ -192,9 +194,21 @@ export default class UserController implements IControllerBase {
                 return res.status(404).json({ message: "User not found!" })
             }
 
+            if (req?.user?.email !== body?.email) {
+                const userWithEmail = await this.prisma.user.findFirst({
+                    where: {
+                        email: body?.email,
+                        companyId: req?.user?.companyId,
+                        id: {
+                            not: { equals: userExists.id }
+                        }
+                    }
+                })
+                if (userWithEmail) return res.status(400).json({ message: "Email used by another user!" })
+            }
             const result = await this.prisma.user.update({
                 where: { id: userId },
-                data: { ...req.body },
+                data: body,
             })
 
             return res.status(200).json({
@@ -229,7 +243,7 @@ export default class UserController implements IControllerBase {
             const password = generateHashedPassword(newPassword)
             const updatedUser = await this.prisma.user.update({ where: { id: currentUser?.id }, data: { password } })
 
-            return res.status(200).json({ result: { ...updatedUser, password: null } })
+            return res.status(200).json({ message: "Updated password successfully!" })
         } catch (error) {
             console.log(error);
             return res.status(500).json(errorMessage(error))
@@ -321,7 +335,7 @@ export default class UserController implements IControllerBase {
                         include: { customer: { select: { email: true, name: true } } }
                     }
                 },
-                where: { ...filter, read: false  },
+                where: { ...filter, read: false },
                 orderBy: {
                     createdAt: "desc"
                 }

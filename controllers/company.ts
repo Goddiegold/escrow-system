@@ -21,7 +21,9 @@ export default class CompanyController implements IControllerBase {
 
         this.router.get("/get-users",
             [userAuth, requireRole([user_role.company, user_role.admin])], this.getUsers)
-        this.router.post("/register", [userAuth, requireRole([user_role.company])], this.addCompanyInfo)
+        this.router.post("/register",
+            [userAuth, requireRole([user_role.company])],
+            this.addCompanyInfo)
         this.router.get("/company-info/:companySlug", this.getCompanyInfo)
         this.router.get("/all-companies", [userAuth, requireRole([user_role.admin])], this.getCompanies)
     }
@@ -30,11 +32,15 @@ export default class CompanyController implements IControllerBase {
     getUsers = async (req: AuthenticatedRequest, res: Response) => {
         try {
             const userRole = req?.query?.role as user_role;
-            const companyId = req?.query?.companyId as string;
-            const filter = {};
-            if (companyId || req?.user?.companyId) {
-                //@ts-ignore
-                filter["companyId"] = companyId ?? req?.user?.companyId
+            const companyId = req?.query?.companyId as string || req?.user?.companyId;
+
+            const filter: Record<string, any> = {};
+            if (companyId) {
+                // if (req?.user?.role !== user_role.admin) {
+                    const companyExists = await this.prisma.company.findFirst({ where: { id: companyId } })
+                    if (!companyExists) return res.status(404).json({ message: "Company not found!" })
+                // }
+                filter["companyId"] = companyId
             }
             const result = await this.prisma.user.findMany({
                 select: { id: true, email: true, name: true, createdAt: true, companyId: true },
