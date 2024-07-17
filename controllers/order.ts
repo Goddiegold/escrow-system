@@ -253,7 +253,7 @@ export default class OrderController implements IControllerBase {
         try {
             const companyId = req?.params?.companyId;
             const status = req?.query?.status as order_status;
-            const filter:Record<string, any> = {};
+            const filter: Record<string, any> = {};
 
             if (status) {
                 const statusValue = (status === order_status.pending || status === order_status.delivered) ? status : undefined;
@@ -261,6 +261,10 @@ export default class OrderController implements IControllerBase {
                     return res.status(400).json({ message: "Something went wrong!" })
                 }
 
+                // if (status === order_status.pending) {
+                    // filter["userPaid"] = true;
+                // }
+                filter["userPaid"] = true;
                 filter["order_status"] = statusValue;
             }
 

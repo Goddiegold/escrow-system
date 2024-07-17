@@ -44,7 +44,8 @@ async function sendEmail(mailData: any) {
 
         const mailOptions = {
             from: "Escrow <mailtrap@demomailtrap.com>",
-            to: mailData?.email,
+            // to: mailData?.email,
+            to: "gehikhamhen247@gmail.com",
             subject: content?.subject,
             html: htmlToSend,
         };
