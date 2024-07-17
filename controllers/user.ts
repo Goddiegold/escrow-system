@@ -11,8 +11,7 @@ import {
 import { Router, Request, Response } from 'express';
 import { AuthenticatedRequest, IControllerBase, RequestType } from '../shared/types';
 import { requireRole, userAuth } from '../shared/middlewares';
-import { PrismaClient, User, user_role, Notification } from '@prisma/client';
-import mailService from '../shared/mailService';
+import { PrismaClient, User, user_role } from '@prisma/client';
 
 
 export default class UserController implements IControllerBase {
@@ -36,7 +35,7 @@ export default class UserController implements IControllerBase {
         this.router.put("/notifications/:notificationId",
             [userAuth, requireRole([user_role.company, user_role.vendor])], this.markNotificationAsRead)
 
-        this.router.get("/payment-history", [userAuth, requireRole([user_role.vendor])], this.vendorPaymentHistory)
+        this.router.get("/wallet-history", [userAuth, requireRole([user_role.vendor])], this.vendorPaymentHistory)
     }
 
     login = async (req: Request, res: Response) => {
@@ -377,12 +376,17 @@ export default class UserController implements IControllerBase {
 
     vendorPaymentHistory = async (req: AuthenticatedRequest, res: Response) => {
         try {
-            const paidOrders = await this.prisma.order.findMany({
+            const credits = await this.prisma.order.findMany({
                 where: { vendorId: req?.user?.id, userPaid: true },
                 orderBy: { userReceivedOn: "desc" },
                 select: { orderRef: true, totalAmount: true, userReceivedOn: true, },
             })
-            return res.status(200).json({ result: paidOrders })
+            const debits = await this.prisma.withdrawalRecord.findMany({
+                where: { vendorId: req?.user?.id }, orderBy: {
+                    createdAt: "desc"
+                }
+            })
+            return res.status(200).json({ result: { credits, debits } })
         } catch (error) {
             return res.status(500).json(errorMessage(error))
         }

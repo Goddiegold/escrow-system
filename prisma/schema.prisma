@@ -52,8 +52,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  vendorNotifications  Notification[] @relation("vendorNotifications")
-  companyNotifications Notification[] @relation("companyNotifications")
+  vendorNotifications  Notification[]     @relation("vendorNotifications")
+  companyNotifications Notification[]     @relation("companyNotifications")
+  withdrawals          WithdrawalRecord[]
 }
 
 model Order {
@@ -132,4 +133,13 @@ enum notification_type {
   order_cancelled       @map("order_cancelled")
   order_delivered       @map("order_delivered")
   delivery_confirmed    @map("delivery_confirmed")
+}
+
+model WithdrawalRecord {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  vendorId  String?   @db.ObjectId
+  vendor    User?     @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  amount    Float?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
