@@ -90,3 +90,11 @@ export type NotificationType = {
     order: Order | null,
     createdAt: Date | null
 }
+
+export type WithdrawalRecord = {
+    id: string;
+    amount: number;
+    vendorId: string | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+}

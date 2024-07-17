@@ -1,10 +1,10 @@
 import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
 import { toast } from "@/shared/helpers";
-import { Order } from "@/shared/types";
-import { ActionIcon, Button, Card, Flex, Modal, NumberFormatter, NumberInput, Paper, SegmentedControl, Skeleton, Space, Text, TextInput } from "@mantine/core";
+import { Order, WithdrawalRecord } from "@/shared/types";
+import { ActionIcon, Button, Card, Center, Flex, Modal, NumberFormatter, NumberInput, Paper, SegmentedControl, Skeleton, Space, Text } from "@mantine/core";
 import { useColorScheme, useDisclosure } from "@mantine/hooks";
-import { DotsThreeVertical, Eye, EyeSlash, Package, Truck } from "@phosphor-icons/react";
+import { Eye, EyeSlash, Truck } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -22,8 +22,14 @@ const WalletPage = () => {
         queryKey: ["wallet_history", user?.id],
         queryFn: async () => {
             try {
-                const res = await clientInstance().get("/users/payment-history")
-                return res.data?.result as Order[]
+                const res = await clientInstance().get("/users/wallet-history")
+                const result = res?.data?.result;
+                const debits = result?.debits as WithdrawalRecord[]
+                const credits = result?.credits as Order[]
+                return {
+                    debits,
+                    credits
+                }
             } catch (error) {
                 toast(error?.response?.data?.message).error()
             }
@@ -57,9 +63,6 @@ const WalletPage = () => {
 
                                     </Text>
                                 </Flex>
-                                {/* <ActionIcon variant="transparent">
-                                <DotsThreeVertical size={20} color={iconColor} weight="bold" />
-                            </ActionIcon> */}
                                 <Button variant="transparent" onClick={open}>Withdraw</Button>
                             </Flex>
                         </Paper>
@@ -72,21 +75,34 @@ const WalletPage = () => {
                                 fullWidth
                                 data={['Credit', 'Debit']} />
 
-                            <Flex direction={"column"} my={"md"}>
-                                {data?.map(item => (
-                                    <Flex className="border-b" justify={"space-between"} p={"sm"} align={"center"}>
-                                        <Text fz={"sm"}>
-                                            <Truck size={20} weight="duotone" />
-                                            Delivery of order {item?.orderRef}</Text>
-                                        <Text fz={"sm"} c={"green"} fw={600}>
-                                            {balIsVisible ? <NumberFormatter
-                                                thousandSeparator
-                                                prefix="₦"
-                                                value={item?.totalAmount} /> : "₦ * * * * *"}
-                                        </Text>
-                                    </Flex>
-                                ))}
-                            </Flex>
+                            {selectedOption === "Credit" ? <Flex direction={"column"} my={"md"}>
+
+                                {data?.credits?.length > 0 ? <>
+                                    {data?.credits?.map((item, idx) => (
+                                        <Flex className="border-b" justify={"space-between"} p={"sm"} align={"center"} key={idx}>
+                                            <Text fz={"sm"}>
+                                                <Truck size={20} weight="duotone" />
+                                                Delivery of order {item?.orderRef}</Text>
+                                            <Text fz={"sm"} c={"green"} fw={600}>
+                                                {balIsVisible ? <NumberFormatter
+                                                    thousandSeparator
+                                                    prefix="₦"
+                                                    value={item?.totalAmount} /> : "₦ * * * * *"}
+                                            </Text>
+                                        </Flex>
+                                    ))}
+                                </> : <Center my={"md"}>
+                                    <Text>No credit found</Text>
+                                </Center>}
+
+                            </Flex> : <Flex direction={"column"} my={"md"}>
+                                {data?.debits?.length > 0 ? <></> : <>
+                                    <Center my={"md"}>
+                                        <Text>No debit found</Text>
+                                    </Center>
+                                </>}
+                            </Flex>}
+
                         </Card>
                     </> :
                     <>
@@ -99,18 +115,18 @@ const WalletPage = () => {
 
             <Modal opened={opened} onClose={close} withCloseButton centered title={<Text fw={600}>Withdraw</Text>}>
                 <NumberInput
-                leftSection={<Text size="md">₦</Text>}
+                    leftSection={<Text size="md">₦</Text>}
                     label="Amount"
                     placeholder="e.g 500"
                     // prefix="₦"
-                     thousandSeparator=","
+                    thousandSeparator=","
                     // defaultValue={100}
                     mb="md"
                 />
                 <Flex justify={"flex-end"}>
-                <Button>
-                    Proceed
-                </Button>
+                    <Button>
+                        Proceed
+                    </Button>
                 </Flex>
             </Modal>
         </>
