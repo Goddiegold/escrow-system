@@ -409,7 +409,7 @@ export default class OrderController implements IControllerBase {
                         template: "confirmOrderDelivery",
                         companyName: updateOrder.company?.name,
                         orderRef: updateOrder.orderRef,
-                        url: `${process.env.FRONTEND_URL}/co nfirm-delivery/${updateOrder.id}`,
+                        url: `${process.env.FRONTEND_URL}/confirm-delivery/${updateOrder.id}`,
                         name: updateOrder.customer?.name,
                         vendor: updateOrder.vendor?.name
                     })
