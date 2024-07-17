@@ -35,6 +35,8 @@ export default class UserController implements IControllerBase {
         this.router.get("/notifications", [userAuth, requireRole([user_role.company, user_role.vendor])], this.getNotifications)
         this.router.put("/notifications/:notificationId",
             [userAuth, requireRole([user_role.company, user_role.vendor])], this.markNotificationAsRead)
+
+        this.router.get("/payment-history", [userAuth, requireRole([user_role.vendor])], this.vendorPaymentHistory)
     }
 
     login = async (req: Request, res: Response) => {
@@ -372,5 +374,19 @@ export default class UserController implements IControllerBase {
             return res.status(500).json(errorMessage(error))
         }
     }
+
+    vendorPaymentHistory = async (req: AuthenticatedRequest, res: Response) => {
+        try {
+            const paidOrders = await this.prisma.order.findMany({
+                where: { vendorId: req?.user?.id, userPaid: true },
+                orderBy: { userReceivedOn: "desc" },
+                select: { orderRef: true, totalAmount: true, userReceivedOn: true, },
+            })
+            return res.status(200).json({ result: paidOrders })
+        } catch (error) {
+            return res.status(500).json(errorMessage(error))
+        }
+    }
+
 }
 

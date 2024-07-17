@@ -38,6 +38,8 @@ model User {
   phone         String?
   address       String?
 
+  wallet Float? @default(0)
+
   vendorOrders   Order[] @relation("vendorOrders") //belongs to the vendor
   customerOrders Order[] @relation("customerOrders") //belongs to the customer
 

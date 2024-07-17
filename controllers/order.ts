@@ -50,6 +50,8 @@ export default class OrderController implements IControllerBase {
             this.placeOrder)
 
         this.router.post("/confirm-delivery/:orderId", this.confirmOrder)
+
+      
     }
 
 
@@ -262,7 +264,7 @@ export default class OrderController implements IControllerBase {
                 }
 
                 // if (status === order_status.pending) {
-                    // filter["userPaid"] = true;
+                // filter["userPaid"] = true;
                 // }
                 filter["userPaid"] = true;
                 filter["order_status"] = statusValue;
@@ -486,7 +488,10 @@ export default class OrderController implements IControllerBase {
     confirmOrder = async (req: AuthenticatedRequest, res: Response) => {
         try {
             const orderId = req.params?.orderId
-            const order = await this.prisma.order.findFirst({ where: { id: orderId } })
+            const order = await this.prisma.order.findFirst({
+                include: { vendor: { select: { wallet: true } } },
+                where: { id: orderId }
+            })
             if (!order) {
                 return res.status(404).json({ message: "Order was not found!" })
             }
@@ -522,6 +527,8 @@ export default class OrderController implements IControllerBase {
             }
 
             //credit vendor
+            const totalWalletBal = order.vendor?.wallet! + order.totalAmount!
+            await this.prisma.user.update({ where: { id: order.vendorId! }, data: { wallet: totalWalletBal } })
             return res.status(200).json({
                 message: "Order has being confirmed successfully!",
             })
@@ -530,6 +537,6 @@ export default class OrderController implements IControllerBase {
         }
     }
 
-
+  
 
 }
