@@ -5,8 +5,9 @@ export type User = {
     role: user_role,
     emailVerified: boolean,
     company?: Company,
-    companyId?: string, 
-    address?:string, 
+    companyId?: string,
+    address?: string,
+    wallet: string
 }
 
 export type Company = {

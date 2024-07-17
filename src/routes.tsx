@@ -14,6 +14,7 @@ import RegisteredCompanies from "./pages/dashboard/RegisteredCompanies";
 import ConfirmDelivery from "./pages/ConfirmDelivery";
 import NotificationsPage from "./pages/dashboard/NotificationsPage";
 import PaymentPage from "./pages/PaymentPage";
+import WalletPage from "./pages/dashboard/Wallet";
 
 const router = createBrowserRouter([
     {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard",
                 element: <DashboardHome />,
+            },
+            {
+                path: "/dashboard/wallet",
+                element: <WalletPage />,
             },
             {
                 path: "/dashboard/registered-vendors",

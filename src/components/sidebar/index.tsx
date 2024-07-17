@@ -26,7 +26,7 @@ export function NavbarSimpleColored() {
       position = 1;
       newItem = [
         {
-          link: '',
+          link: '/dashboard/wallet',
           label: 'Wallet',
           icon: Wallet
         },
