@@ -191,8 +191,8 @@ const OrderPendingDeliveries = () => {
                     <Table.Tr>
                         <Table.Th>Ref./ID</Table.Th>
                         <Table.Th>Customer</Table.Th>
+                        {isNotVendor && <Table.Th>Vendor</Table.Th>}
                         <Table.Th>Product</Table.Th>
-                        {isNotVendor && <Table.Th>User Paid</Table.Th>}
                         <Table.Th>Delivered</Table.Th>
                         <Table.Th>Customer Confirmed</Table.Th>
                     </Table.Tr>

@@ -644,6 +644,10 @@ video {
   width: 4rem;
 }
 
+.w-\[200px\]{
+  width: 200px;
+}
+
 .w-\[30px\]{
   width: 30px;
 }
@@ -654,18 +658,6 @@ video {
 
 .w-full{
   width: 100%;
-}
-
-.w-\[200px\]{
-  width: 200px;
-}
-
-.w-\[250px\]{
-  width: 250px;
-}
-
-.w-\[290px\]{
-  width: 290px;
 }
 
 .max-w-\[80\%\]{
@@ -923,10 +915,6 @@ button{
     height: 150px;
   }
 
-  .sm\:w-\[300px\]{
-    width: 300px;
-  }
-
   .sm\:w-\[400px\]{
     width: 400px;
   }
@@ -955,10 +943,6 @@ button{
 
   .md\:hidden{
     display: none;
-  }
-
-  .md\:w-\[50\%\]{
-    width: 50%;
   }
 }
 

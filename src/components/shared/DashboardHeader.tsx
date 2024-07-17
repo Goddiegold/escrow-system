@@ -4,13 +4,14 @@ import {
 } from "@mantine/core";
 import Logo from "./Logo";
 import { Bell, CaretRight, Moon, Sun } from "@phosphor-icons/react";
-import { getInitials, menuData } from "@/shared/helpers";
+import { getInitials, menuData, removeUserToken } from "@/shared/helpers";
 import { IoMdLogOut } from "react-icons/io";
 import { useUserContext } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useClient } from "@/shared/client";
 import { useQuery } from "@tanstack/react-query";
-import { user_role } from "@/shared/types";
+import { Action_Type, user_role } from "@/shared/types";
+import useNavigation from "@/hooks/useNavigation";
 
 interface DashboardHeaderProps {
     mobileOpened: boolean,
@@ -23,15 +24,26 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
         const { colorScheme, toggleColorScheme } = useMantineColorScheme();
         const dark = colorScheme === 'dark';
         const navigate = useNavigate()
-        const { user } = useUserContext()
+        const navigateHelper = useNavigation()
+        const { user, userDispatch } = useUserContext()
         const isAdmin = user?.role === user_role.admin
         const queryKey = ["notifications", user?.id]
         const clientInstance = useClient()
+
+        const handleLogout = () => {
+            removeUserToken()
+            userDispatch({
+                type: Action_Type.LOGOUT_USER,
+                payload: null
+            })
+            navigate(user?.role === user_role.vendor ? `/${user?.company?.slug}/login` : "/login")
+        }
 
         const MenuOptions = () => {
             return (<>
                 {menuData?.map(item => (
                     <Menu.Item
+                        onClick={() => navigateHelper(item.link)}
                         my={10}
                         leftSection={<item.icon size={20} />}>{item.label}</Menu.Item>
                 ))}
@@ -134,7 +146,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                             </Flex>
                             <Menu.Item
                                 my={10}
-                                leftSection={<IoMdLogOut stroke={`1.5`} size={20} />}>Logout</Menu.Item>
+                                leftSection={<IoMdLogOut stroke={`1.5`} size={20} />}
+                                onClick={handleLogout}>Logout</Menu.Item>
                         </Menu.Dropdown>
                     </Menu>
                 </Flex>

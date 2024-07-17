@@ -106,10 +106,10 @@ const AllOrders = () => {
                                     </Flex>
                                 </Table.Td>
 
-                                <Table.Td>
+                              {isNotVendor && <Table.Td>
                                     <Badge
                                         color={item.userPaid ? "green" : "red"}>{item?.userPaid ? "Paid" : "Not Paid"}</Badge>
-                                </Table.Td>
+                                </Table.Td>}
 
                                 <Table.Td>
                                     {(item.order_status === order_status.pending) ||
