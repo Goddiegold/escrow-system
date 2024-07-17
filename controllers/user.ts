@@ -11,7 +11,7 @@ import {
 import { Router, Request, Response } from 'express';
 import { AuthenticatedRequest, IControllerBase, RequestType } from '../shared/types';
 import { requireRole, userAuth } from '../shared/middlewares';
-import { PrismaClient, User, user_role } from '@prisma/client';
+import { PrismaClient, User, user_role} from '@prisma/client';
 
 
 export default class UserController implements IControllerBase {
@@ -36,6 +36,7 @@ export default class UserController implements IControllerBase {
             [userAuth, requireRole([user_role.company, user_role.vendor])], this.markNotificationAsRead)
 
         this.router.get("/wallet-history", [userAuth, requireRole([user_role.vendor])], this.vendorPaymentHistory)
+        this.router.post("/make-withdrawal", [userAuth, requireRole([user_role.vendor])], this.makeWithdrawal)
     }
 
     login = async (req: Request, res: Response) => {
@@ -387,6 +388,36 @@ export default class UserController implements IControllerBase {
                 }
             })
             return res.status(200).json({ result: { credits, debits } })
+        } catch (error) {
+            return res.status(500).json(errorMessage(error))
+        }
+    }
+
+    makeWithdrawal = async (req: AuthenticatedRequest, res: Response) => {
+        try {
+            const amount = req?.body?.amount as number;
+            const currentUser = req?.user as User;
+
+            if (amount > currentUser.wallet!) {
+                return res.status(400).json({ message: "Insufficient funds!" })
+            }
+
+            const updatedUser = await this.prisma.user.update({
+                where: { id: currentUser?.id },
+                data: { wallet: currentUser.wallet! - amount }
+            })
+
+            const newWithdrawal = await this.prisma.withdrawalRecord.create({
+                 data: { vendorId: currentUser?.id, amount } })
+
+            return res.status(200)
+                .json({
+                    result: {
+                        user: { ...updatedUser, password: null },
+                        newWithdrawal
+                    },
+                    message: "Your request is been processed!",
+                })
         } catch (error) {
             return res.status(500).json(errorMessage(error))
         }
