@@ -94,7 +94,16 @@ export type NotificationType = {
 export type WithdrawalRecord = {
     id: string;
     amount: number;
+    type:withdrawal_record_type;
     vendorId: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
+}
+
+
+export enum withdrawal_record_type {
+    pending = "pending",
+    success = "success",
+    failed = "failed",
+    reversed = "reversed"
 }
