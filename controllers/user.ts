@@ -11,7 +11,8 @@ import {
 import { Router, Request, Response } from 'express';
 import { AuthenticatedRequest, IControllerBase, RequestType } from '../shared/types';
 import { requireRole, userAuth } from '../shared/middlewares';
-import { PrismaClient, User, user_role} from '@prisma/client';
+import { Company, PrismaClient, User, user_role } from '@prisma/client';
+import mailService from '../shared/mailService';
 
 
 export default class UserController implements IControllerBase {
@@ -27,8 +28,8 @@ export default class UserController implements IControllerBase {
         this.router.post('/login', this.login)
         this.router.post('/register', this.register)
         this.router.get('/profile', userAuth, this.getProfile)
-        this.router.post("/reset-password-1", this.resetPassword1)
-        this.router.put("/reset-password-2/:otl", this.resetPassword3)
+        this.router.post("/reset-password", this.resetPassword1)
+        this.router.post("/reset-password/:otl", this.resetPassword2)
         this.router.put("/update-profile", userAuth, this.updateProfile)
         this.router.put("/update-password", userAuth, this.updatePassword)
         this.router.get("/notifications", [userAuth, requireRole([user_role.company, user_role.vendor])], this.getNotifications)
@@ -44,18 +45,17 @@ export default class UserController implements IControllerBase {
         if (error) return res.status(400).json({ message: error.details[0].message })
 
         try {
-            const filter = {};
+            const filter: Record<any, string | []> = {}
             const { email, password } = req.body;
 
-            const companySlug = req?.query?.companySlug as string;
+            const companyId = req?.query?.companyId as string;
 
-            if (companySlug) {
-                const company = await this.prisma.company.findFirst({ where: { slug: companySlug } })
+            if (companyId) {
+                const company = await this.prisma.company.findFirst({ where: { id: companyId } })
                 if (!company) return res.status(404).json({ message: "Invalid login link!" })
 
-                //@ts-ignore
                 filter["companyId"] = company.id;
-                //@ts-ignore
+
                 filter["role"] = user_role.vendor;
             } else {
                 //@ts-ignore
@@ -93,25 +93,21 @@ export default class UserController implements IControllerBase {
         const { error } = validateRequestBody(req.body, RequestType.SIGN_UP);
         if (error) return res.status(400).json({ message: error.details[0].message })
         try {
-            const filter = {};
-            const data = {};
+            const filter: Record<string, string> = {};
+            const data: Record<string, string> = {};
             const { email } = req.body;
-            const companySlug = req?.query?.companySlug as string;
+            const companyId = req?.query?.companyId as string;
 
-            if (companySlug) {
-                const company = await this.prisma.company.findFirst({ where: { slug: companySlug } })
+            if (companyId) {
+                const company = await this.prisma.company.findFirst({ where: { id: companyId } })
                 if (!company) return res.status(404).json({ message: "Invalid registration link!" })
 
-                //@ts-ignore
                 filter["companyId"] = company.id;
 
-                //@ts-ignore
                 data["companyId"] = company.id;
 
-                //@ts-ignore
                 data["role"] = user_role.vendor;
             } else {
-                //@ts-ignore
                 data["role"] = user_role.company;
             }
 
@@ -255,8 +251,19 @@ export default class UserController implements IControllerBase {
     resetPassword1 = async (req: Request, res: Response) => {
         try {
             const { email } = req.body;
+            const companyId = req?.query?.companyId as string;
+            const filter: Record<string, string> = {}
+            let company: Company | null = null;
+
+            if (companyId) {
+                company = await this.prisma.company.findFirst({ where: { id: companyId } });
+                if (!company) return res.status(404).json({ message: "Company not found!" })
+                filter["companyId"] = companyId
+                filter["role"] = user_role.vendor
+            }
+
             const user = await this.prisma.user.findFirst({
-                where: { email },
+                where: { email, ...filter },
                 select: { name: true, id: true }
             })
             if (!user) return res.status(404).json({ message: "User not found!" })
@@ -264,17 +271,17 @@ export default class UserController implements IControllerBase {
             const { otl, expires } = generateOTL()
 
             await this.prisma.user.update({
-                where: { id: user?.id },
+                where: { id: user?.id, },
                 data: { otp: otl, otpDuration: new Date(expires) }
             })
 
-            // mailService({
-            //     subject: "A request has been made to reset your password",
-            //     email,
-            //     template: "forgotPassword",
-            //     name: user.name,
-            //     url: `${process.env.FRONTEN_URL}/reset-password/${otl}`
-            // })
+            mailService({
+                subject: "A request has been made to reset your password",
+                email,
+                template: "forgotPassword",
+                name: user.name,
+                url: `${process.env.FRONTEND_URL}${company ? `/${company?.slug}` : ""}/reset-password/${otl}`
+            })
             return res.status(200).json({ message: "Check your mail!" })
         } catch (error) {
             console.log(error);
@@ -282,16 +289,28 @@ export default class UserController implements IControllerBase {
         }
     }
 
-    resetPassword3 = async (req: Request, res: Response) => {
+    resetPassword2 = async (req: Request, res: Response) => {
         try {
             const { otl } = req.params;
+            const filter: Record<string, string> = {}
+            const companyId = req?.query?.companyId as string;
+            let company: Company | null = null;
+
+            if (companyId) {
+                company = await this.prisma.company.findFirst({ where: { id: companyId } });
+                if (!company) return res.status(404).json({ message: "Company not found!" })
+                filter["companyId"] = companyId
+                filter["role"] = user_role.vendor
+            }
+
 
             const user = await this.prisma.user.findFirst({
                 where: {
                     otp: otl,
                     otpDuration: {
                         gt: new Date(Date.now())
-                    }
+                    },
+                    ...filter
                 },
                 select: {
                     email: true,
@@ -408,7 +427,8 @@ export default class UserController implements IControllerBase {
             })
 
             const newWithdrawal = await this.prisma.withdrawalRecord.create({
-                 data: { vendorId: currentUser?.id, amount } })
+                data: { vendorId: currentUser?.id, amount }
+            })
 
             return res.status(200)
                 .json({
