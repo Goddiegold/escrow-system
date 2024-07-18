@@ -6,7 +6,7 @@ import { Flex, Text } from "@mantine/core";
 
 const Logo = () => {
     return (
-        <Flex>
+        <Flex className="cursor-pointer">
         <div className='bg-color-1 h-[30px] w-[30px] rounded-md mr-[10px]'>
 
         </div>

@@ -57,7 +57,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
                 toast(err?.response?.data?.message).error()
             }
         }),
-        enabled: !!token
+        enabled: !!localStorage.getItem(LCPD_ESCROW_SYS_USER_TOKEN)
     })
 
     if (data && !user?.name) {

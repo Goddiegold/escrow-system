@@ -2,6 +2,7 @@ import { Flex, Text, BackgroundImage, Paper, Group, Center } from '@mantine/core
 import { ReactNode } from 'react';
 import handshakePic from "@/assets/handshake.jpg"
 import Logo from '../shared/Logo';
+import { useNavigate } from 'react-router-dom';
 
 interface BackgroundLayoutProps {
     title?: string,
@@ -14,6 +15,7 @@ interface BackgroundLayoutProps {
 // "https://source.unsplash.com/1024x768/?girl",
 // "https://source.unsplash.com/1024x768/?tree",
 function BackgroundLayout({ title, children, bottomContent }: BackgroundLayoutProps) {
+    const navigate = useNavigate()
     return (
         <Flex
             mih={"100vh"}
@@ -33,7 +35,7 @@ function BackgroundLayout({ title, children, bottomContent }: BackgroundLayoutPr
                         radius={"sm"}
                         w={"100%"}
                         mx={10}>
-                        <Center my={20}>
+                        <Center my={20} onClick={()=>navigate("/register")}>
                             <Logo />
                         </Center>
                         <Text className="text-center" size="lg" fw={600}>{title}</Text>

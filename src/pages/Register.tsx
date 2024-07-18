@@ -1,5 +1,5 @@
 import BackgroundLayout from "@/components/layout/BackgroundLayout";
-import { Button, LoadingOverlay, PasswordInput, TextInput, Text, Flex }
+import { Button, PasswordInput, TextInput, Text }
     from "@mantine/core";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -19,6 +19,7 @@ const Register = () => {
     const { userDispatch } = useUserContext()
     const clientInstance = useClient()
     const { companySlug } = useParams()
+    const loginPath = !companySlug ? '/login' : `/${companySlug}/login`
 
     const { data, isLoading } = useQuery({
         queryKey: ["company-info", companySlug],
@@ -35,22 +36,22 @@ const Register = () => {
     const handleRegister = async (user: { email: string, password: string }) => {
         try {
             setLoading(true)
-            const res = await client().post(!companySlug ? `/users/register` :
-                `/users/register?companySlug=${companySlug}`, { ...user })
+           await client().post(!companySlug ? `/users/register` :
+                `/users/register?companyId=${data?.id}`, { ...user })
             setLoading(false)
-            const token = res.headers["authorization"];
-            toast('Logged In Successfully!').success()
-            const userDetails = res.data?.result as User
-            if (userDispatch) {
-                userDispatch({
-                    type: Action_Type.USER_PROFILE,
-                    payload: {
-                        ...userDetails,
-                        token
-                    }
-                })
-            }
-            navigate("/dashboard")
+            navigate(loginPath)
+            // const token = res.headers["authorization"];
+            // toast('Logged In Successfully!').success()
+            // const userDetails = res.data?.result as User
+            // if (userDispatch) {
+            //     userDispatch({
+            //         type: Action_Type.USER_PROFILE,
+            //         payload: {
+            //             ...userDetails,
+            //             token
+            //         }
+            //     })
+            // }
         } catch (error: any) {
             setLoading(false)
             toast(error?.response?.data?.message).error()
@@ -83,7 +84,7 @@ const Register = () => {
             bottomContent={<>
                 <Text style={{ textAlign: "center" }} size="sm">Already have an account ?
                     {" "}
-                    <Link to={!companySlug ? '/login' : `/${companySlug}/login`}
+                    <Link to={loginPath}
                         className="font-bold text-blue-400 no-underline">
                         Login
                     </Link>

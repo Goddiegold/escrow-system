@@ -2,7 +2,7 @@ import BackgroundLayout from "@/components/layout/BackgroundLayout";
 import {
     Button, PasswordInput,
     TextInput, Text,
-    LoadingOverlay
+    Flex
 } from "@mantine/core";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
@@ -39,7 +39,7 @@ const Login = () => {
         try {
             setLoading(true)
             const res = await client().post(companySlug ?
-                `/users/login?companySlug=${companySlug}` :
+                `/users/login?companyId=${data?.id}` :
                 "/users/login", { ...user })
             setLoading(false)
             const token = res.headers["authorization"];
@@ -109,6 +109,7 @@ const Login = () => {
         >
             <form method="POST" onSubmit={handleSubmit}>
                 <TextInput
+                    required
                     onBlur={handleBlur("email")}
                     value={values.email}
                     onChange={handleChange("email")}
@@ -117,6 +118,7 @@ const Login = () => {
                     label="Email"
                     my={10} />
                 <PasswordInput
+                    required
                     onBlur={handleBlur("password")}
                     value={values.password}
                     onChange={handleChange("password")}
@@ -124,10 +126,21 @@ const Login = () => {
                     error={errors.password && touched?.password ? errors.password : null}
                     label="Password"
                     my={10} />
-                <Button
-                    loading={loading}
-                    type="submit"
-                    my={10}>Login</Button>
+                <Flex justify={"space-between"} align={"center"}>
+                    <Button
+                        loading={loading}
+                        type="submit"
+                        my={10}>Login</Button>
+
+                    <Button
+                        onClick={() => navigate(!companySlug ? "/reset-password" : `/${companySlug}/reset-password`)}
+                        fw={300}
+                        fz={"sm"}
+                        px={0}
+                        variant="transparent">
+                        Forgot password?
+                    </Button>
+                </Flex>
             </form>
         </BackgroundLayout>
     );

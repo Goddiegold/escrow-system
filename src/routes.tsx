@@ -15,6 +15,7 @@ import ConfirmDelivery from "./pages/ConfirmDelivery";
 import NotificationsPage from "./pages/dashboard/NotificationsPage";
 import PaymentPage from "./pages/PaymentPage";
 import WalletPage from "./pages/dashboard/Wallet";
+import ResetPassword from "./pages/ResetPassword";
 
 const router = createBrowserRouter([
     {
@@ -111,6 +112,22 @@ const router = createBrowserRouter([
             {
                 path: "/payment/:orderRef",
                 element: <PaymentPage />
+            },
+            {
+                path:"/reset-password", 
+                element:<ResetPassword/>
+            }, 
+            {
+                path:"/reset-password/:otl", 
+                element:<ResetPassword/>
+            },
+            {
+                path:"/:companySlug/reset-password", 
+                element:<ResetPassword/>
+            }, 
+            {
+                path:"/:companySlug/reset-password/:otl", 
+                element:<ResetPassword/>
             }
         ]
     },
