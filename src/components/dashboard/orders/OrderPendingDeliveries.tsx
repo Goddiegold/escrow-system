@@ -167,6 +167,7 @@ const OrderPendingDeliveries = () => {
                 toast(err?.response?.data?.message).error();
                 return [] as OrderType[]
             }),
+            refetchInterval:30000
     })
 
     const isNotVendor = (user?.role === user_role.admin) || (user?.role === user_role.company)

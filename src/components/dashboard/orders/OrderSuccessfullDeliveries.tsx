@@ -43,6 +43,7 @@ const SuccessfullPendingDeliveries = () => {
                     orders: [] as OrderType[]
                 }
             }),
+            refetchInterval:30000
     })
 
     const isNotVendor = (user?.role === user_role.admin) || (user?.role === user_role.company)
@@ -132,9 +133,9 @@ const SuccessfullPendingDeliveries = () => {
                                 {isNotVendor && <Table.Td>
                                     <Text fz="sm">{item?.vendor?.name}</Text>
                                     <Text fz={"xs"} c={"dimmed"}>{item?.vendor?.email}</Text>
-                                    <Link
+                                    {/* <Link
                                         to={"#"}
-                                        className="text-color-1 text-xs underline">more orders</Link>
+                                        className="text-color-1 text-xs underline">more orders</Link> */}
                                 </Table.Td>}
 
 
@@ -159,7 +160,7 @@ const SuccessfullPendingDeliveries = () => {
                                 </Table.Td>
 
                                 <Table.Td>
-                                    {item.vendorDelivered}
+                                    {/* {item.vendorDelivered} */}
                                     <Badge
                                         // size=""
                                         color={item.vendorDelivered ? "green" : "orange"}>

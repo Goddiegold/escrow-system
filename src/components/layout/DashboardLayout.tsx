@@ -1,5 +1,5 @@
 import { NavbarSimpleColored } from '@/components/sidebar';
-import { AppShell, Button, CopyButton, Flex, Text, Tooltip } from '@mantine/core';
+import { AppShell, Button, CopyButton, Flex, Text, Tooltip, useMantineColorScheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import DashboardHeader from '../shared/DashboardHeader';
@@ -13,6 +13,8 @@ export default function DashboardLayout() {
     const location = useLocation()
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
     const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+    const { colorScheme } = useMantineColorScheme();
+    const dark = colorScheme === 'dark';
 
     const [isMobile, setIsMobile] = useState(false);
 
@@ -55,7 +57,10 @@ export default function DashboardLayout() {
                 <AppShell.Navbar >
                     <NavbarSimpleColored />
                 </AppShell.Navbar>
-                <AppShell.Main bg={"rgb(248, 249, 250)"}>
+                <AppShell.Main
+                
+                    bg={dark ? "inherit" : "rgb(248, 249, 250)"}
+                >
                     <Flex direction={"column"} p={10}>
                         {location.pathname === "/dashboard" &&
                             <Flex direction={"row"} justify={"space-between"}>

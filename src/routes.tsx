@@ -16,6 +16,8 @@ import NotificationsPage from "./pages/dashboard/NotificationsPage";
 import PaymentPage from "./pages/PaymentPage";
 import WalletPage from "./pages/dashboard/Wallet";
 import ResetPassword from "./pages/ResetPassword";
+import PrivateRoute from "./components/shared/PrivateRoute";
+import { user_role } from "./shared/types";
 
 const router = createBrowserRouter([
     {
@@ -29,19 +31,32 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard/wallet",
-                element: <WalletPage />,
+                element:
+                    <PrivateRoute roles={[user_role.vendor]}>
+                        <WalletPage />
+                    </PrivateRoute>
+                ,
             },
             {
                 path: "/dashboard/registered-vendors",
-                element: <RegisteredVendors />
+                element:
+                    <PrivateRoute roles={[user_role.company, user_role.admin]}>
+                        <RegisteredVendors />
+                    </PrivateRoute>
             },
             {
                 path: "/dashboard/registered-vendors/:companyId",
-                element: <RegisteredVendors />
+                element:
+                    <PrivateRoute roles={[user_role.admin]}>
+                        <RegisteredVendors />
+                    </PrivateRoute>
             },
             {
                 path: "/dashboard/registered-companies",
-                element: <RegisteredCompanies />
+                element:
+                    <PrivateRoute roles={[user_role.admin]}>
+                        <RegisteredCompanies />
+                    </PrivateRoute>
             },
             {
                 path: "/dashboard/orders",
@@ -69,7 +84,10 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard/notifications",
-                element: <NotificationsPage />
+                element:
+                <PrivateRoute roles={[user_role.company, user_role.vendor]}>
+                    <NotificationsPage />
+                </PrivateRoute>
             }
         ],
     },
@@ -114,20 +132,20 @@ const router = createBrowserRouter([
                 element: <PaymentPage />
             },
             {
-                path:"/reset-password", 
-                element:<ResetPassword/>
-            }, 
-            {
-                path:"/reset-password/:otl", 
-                element:<ResetPassword/>
+                path: "/reset-password",
+                element: <ResetPassword />
             },
             {
-                path:"/:companySlug/reset-password", 
-                element:<ResetPassword/>
-            }, 
+                path: "/reset-password/:otl",
+                element: <ResetPassword />
+            },
             {
-                path:"/:companySlug/reset-password/:otl", 
-                element:<ResetPassword/>
+                path: "/:companySlug/reset-password",
+                element: <ResetPassword />
+            },
+            {
+                path: "/:companySlug/reset-password/:otl",
+                element: <ResetPassword />
             }
         ]
     },

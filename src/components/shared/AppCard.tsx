@@ -1,4 +1,4 @@
-import { Card, Flex, Text } from "@mantine/core";
+import { Card, Flex, Text, useMantineColorScheme } from "@mantine/core";
 import { Icon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 
@@ -13,10 +13,12 @@ interface AppCardProps {
 
 const AppCard: React.FC<AppCardProps> = ({ ...props }) => {
     const { title, action, totalNumber, actionPath, icon: CardIcon } = props
+    const { colorScheme } = useMantineColorScheme();
+    const dark = colorScheme === 'dark';
     return (
         <Card
             mih={150}
-            withBorder
+            withBorder={!dark}
             shadow="sm"
             className={`rounded-xl bg-white py-6 px-7  
             font-3 flex flex-col justify-between`}>
