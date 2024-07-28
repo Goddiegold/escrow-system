@@ -6,6 +6,9 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
 
 enum user_role {
   vendor   @map("vendor")

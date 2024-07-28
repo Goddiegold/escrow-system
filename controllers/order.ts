@@ -136,6 +136,16 @@ export default class OrderController implements IControllerBase {
                 }
             })
 
+            //mail users with pay link
+            mailService({
+                subject: "Order placed for successfully",
+                email:customer.email,
+                template:"orderPlaced", 
+                orderRef, 
+                name: customer!.name,
+                companyName: req.user?.company?.name,
+                url:`${process.env.FRONTEND_URL}/payment/${orderRef.slice(1)}`
+            })
             return res.status(201).json({ result: orders })
 
         } catch (error) {
@@ -237,10 +247,10 @@ export default class OrderController implements IControllerBase {
             const company = orders[0].company;
 
             mailService({
-                subject: "Order placed successfully",
+                subject: "Order paid for successfully",
                 email: customer!.email,
                 orderRef,
-                template: "orderPlaced",
+                template: "orderPaid",
                 name: customer!.name,
                 companyName: company?.name,
             })
@@ -537,6 +547,15 @@ export default class OrderController implements IControllerBase {
         }
     }
 
+    // cancelOrder = async(req:AuthenticatedRequest, res:Response)=>{
+    //     try {
+    //         const orderId = await this.prisma.
+    //     } catch (error) {
+    //         return res.status(500).json(errorMessage(error))
+    //     }
+    // }
+
+    
   
 
 }

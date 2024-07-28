@@ -1,0 +1,161 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Company {
+  id String [pk]
+  name String [not null]
+  email String
+  slug String
+  orders Order [not null]
+  ratings Rating [not null]
+  users User [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table User {
+  id String [pk]
+  name String
+  email String [not null]
+  password String
+  emailVerified Boolean [not null, default: false]
+  role user_role [not null]
+  otp String
+  otpDuration DateTime
+  phone String
+  address String
+  wallet Float [default: 0]
+  vendorOrders Order [not null]
+  customerOrders Order [not null]
+  vendorRatings Rating [not null]
+  customerRatings Rating [not null]
+  company Company
+  companyId String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  vendorNotifications Notification [not null]
+  companyNotifications Notification [not null]
+  withdrawals WithdrawalRecord [not null]
+}
+
+Table Order {
+  id String [pk]
+  customerId String
+  customer User
+  vendorId String
+  vendor User
+  vendorDelivered Boolean [not null, default: false]
+  vendorDeliveredOn DateTime
+  userReceived Boolean [not null, default: false]
+  userReceivedOn DateTime
+  userPaid Boolean [not null, default: false]
+  userPaidOn DateTime
+  rating Rating
+  company Company
+  companyId String
+  order_status order_status [not null, default: 'pending']
+  orderRef String
+  transactionRef String
+  notifications Notification [not null]
+  products Json[] [not null]
+  totalAmount Float
+  authCode String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Rating {
+  id String [pk]
+  value Float
+  review String
+  vendorId String
+  vendor User
+  customerId String
+  customer User
+  order Order [not null]
+  orderId String [unique, not null]
+  company Company
+  companyId String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Notification {
+  id String [pk]
+  type notification_type [not null]
+  order Order
+  orderId String
+  orderRef String
+  vendor User
+  vendorId String
+  company User
+  companyId String
+  message String
+  read Boolean [default: false]
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime
+}
+
+Table WithdrawalRecord {
+  id String [pk]
+  vendorId String
+  vendor User
+  amount Float
+  type withdrawal_record_type [not null, default: 'pending']
+  createdAt DateTime [default: `now()`]
+  updatedAt DateTime
+}
+
+Enum user_role {
+  vendor
+  company
+  customer
+  admin
+}
+
+Enum order_status {
+  pending
+  delivered
+  cancelled
+  delivery_confirmed
+  pending_confirmation
+}
+
+Enum notification_type {
+  customer_placed_order
+  order_cancelled
+  order_delivered
+  delivery_confirmed
+}
+
+Enum withdrawal_record_type {
+  pending
+  success
+  failed
+  reversed
+}
+
+Ref: User.companyId > Company.id [delete: Set Null]
+
+Ref: Order.customerId > User.id [delete: Set Null]
+
+Ref: Order.vendorId > User.id [delete: Set Null]
+
+Ref: Order.companyId > Company.id
+
+Ref: Rating.vendorId > User.id [delete: Set Null]
+
+Ref: Rating.customerId > User.id [delete: Set Null]
+
+Ref: Rating.orderId - Order.id
+
+Ref: Rating.companyId > Company.id [delete: Set Null]
+
+Ref: Notification.orderId > Order.id [delete: Set Null]
+
+Ref: Notification.vendorId > User.id [delete: Set Null]
+
+Ref: Notification.vendorId > User.id [delete: Set Null]
+
+Ref: WithdrawalRecord.vendorId > User.id [delete: Cascade]

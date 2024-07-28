@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Company, User } from "@prisma/client";
 import { Router, Request } from "express";
 
 export interface IControllerBase {
@@ -29,7 +29,7 @@ export type MailContentType = {
 }
 
 export interface AuthenticatedRequest extends Request {
-    user?: User; // Assuming User is the correct type
+    user?: User & { company: Company }; // Assuming User is the correct type
     // company?: Company
 }
 
