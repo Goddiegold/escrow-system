@@ -1,10 +1,10 @@
 import AppCard from "@/components/shared/AppCard";
 import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
-import { toast } from "@/shared/helpers";
+import { convertAmount, toast } from "@/shared/helpers";
 import { Order } from "@/shared/types";
 import { Grid, Skeleton } from "@mantine/core";
-import { Handshake } from "@phosphor-icons/react";
+import { Coins, Handshake } from "@phosphor-icons/react";
 import { useQueries } from "@tanstack/react-query";
 
 const DashboardHome = () => {
@@ -27,15 +27,26 @@ const DashboardHome = () => {
 
     const isLoading = queryResult.find(item => item.isLoading)
 
-    const [orders] = queryResult;
+    const [{ data: orders }] = queryResult;
+
+    const totalAmount = (orders && orders?.length > 0) ? orders?.filter(item => (item.userPaid && item.vendorDelivered  && item.userReceived)).reduce((accumulator, currentItem) => {
+        return accumulator + currentItem.totalAmount;
+    }, 0) : 0;
 
     const cardData = [
         {
             title: "Orders",
             action: "view orders",
-            count: orders?.data?.length ?? 0,
+            count: orders?.length ?? 0,
             path: "/dashboard/orders",
             icon: Handshake
+        },
+        {
+            title: "Total Amount Made",
+            action: "view orders",
+            count: `₦${convertAmount(totalAmount!)}`,
+            path: "/dashboard/orders/successfull-deliveries",
+            icon: Coins
         },
     ]
 
@@ -63,7 +74,7 @@ const DashboardHome = () => {
                                     title={item.title}
                                     action={item.action}
                                     actionPath={item.path}
-                                    // icon={item.icon}
+                                // icon={item.icon}
                                 />
                             </Grid.Col>
                         ))

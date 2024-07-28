@@ -1,10 +1,10 @@
 import AppCard from "@/components/shared/AppCard";
 import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
-import { toast } from "@/shared/helpers";
+import { convertAmount, toast } from "@/shared/helpers";
 import { Order, User, order_status, user_role } from "@/shared/types";
 import { Flex, Grid, Skeleton } from "@mantine/core";
-import { Handshake, ShoppingCartSimple } from "@phosphor-icons/react";
+import { Coins, Handshake, ShoppingCartSimple } from "@phosphor-icons/react";
 import { useQueries } from "@tanstack/react-query";
 
 const DashboardHome = () => {
@@ -40,64 +40,70 @@ const DashboardHome = () => {
         ]
     })
 
-    const [vendors, orders] = queryResult;
+    const [{ data: vendors }, { data: orders }] = queryResult;
+
+    const totalAmount = (orders && orders?.length > 0) ? orders?.filter(item => (item.userPaid && item.vendorDelivered  && item.userReceived)).reduce((accumulator, currentItem) => {
+        return accumulator + currentItem.totalAmount;
+    }, 0) : 0;
 
     const cardData = [
         {
             title: "Registered Vendors",
             action: "view vendors",
-            count: vendors?.data?.length ?? 0,
+            count: vendors?.length ?? 0,
             path: "/dashboard/registered-vendors",
             icon: Handshake
         },
         {
             title: "All Orders",
             action: "view orders",
-            count: orders?.data?.length ?? 0,
+            count: orders?.length ?? 0,
             path: "/dashboard/orders",
             icon: ShoppingCartSimple
+        },
+        {
+            title: "Total Transaction Amount",
+            action: "view orders",
+            count: `₦${convertAmount(totalAmount!)}`,
+            path: "/dashboard/orders/successfull-deliveries",
+            icon: Coins
         },
     ]
 
     const isLoading = queryResult.find(item => item.isLoading)
 
-    const data = [
-        { name: 'Pending', Pending: orders?.data?.filter(item => item.order_status === order_status.pending)?.length },
-        { name: 'Delivered', Delivered: orders?.data?.filter(item => item.order_status === order_status.delivered)?.length },
-        { name: 'Cancelled', Cancelled: orders?.data?.filter(item => item.order_status === order_status.cancelled)?.length },
-    ];
 
     return (
         <Flex direction={"column"} w={"100%"}>
             <Grid>
                 {
-                isLoading ? <>{
-                    Array(3).fill(null).map((item, key) => (
-                        <Grid.Col
-                            key={key}
-                            span={{ base: 12, xs: 12, md: 6, lg: 4 }}>
-                            <Skeleton
-                                className="sm:h-[150px] h-[170px] rounded-xl"
-                                mr={10} />
-                        </Grid.Col>
-                    ))
-                }</> : <>
-                    {
-                        cardData?.map((item, key) => (
+                    isLoading ? <>{
+                        Array(3).fill(null).map((item, key) => (
                             <Grid.Col
                                 key={key}
                                 span={{ base: 12, xs: 12, md: 6, lg: 4 }}>
-                                <AppCard
-                                    totalNumber={item?.count}
-                                    title={item.title}
-                                    action={item.action}
-                                    actionPath={item.path}
-                                    icon={item.icon}
-                                />
+                                <Skeleton
+                                    className="sm:h-[150px] h-[170px] rounded-xl"
+                                    mr={10} />
                             </Grid.Col>
                         ))
-                    }
-                </>}
+                    }</> : <>
+                        {
+                            cardData?.map((item, key) => (
+                                <Grid.Col
+                                    key={key}
+                                    span={{ base: 12, xs: 12, md: 6, lg: 4 }}>
+                                    <AppCard
+                                        totalNumber={item?.count}
+                                        title={item.title}
+                                        action={item.action}
+                                        actionPath={item.path}
+                                        icon={item.icon}
+                                    />
+                                </Grid.Col>
+                            ))
+                        }
+                    </>}
             </Grid>
 
             {/* <BarChart
