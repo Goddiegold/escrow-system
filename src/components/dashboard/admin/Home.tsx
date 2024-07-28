@@ -1,10 +1,10 @@
 import AppCard from "@/components/shared/AppCard";
 import { useUserContext } from "@/context/UserContext";
 import { useClient } from "@/shared/client";
-import { toast } from "@/shared/helpers";
+import { convertAmount, toast } from "@/shared/helpers";
 import { Company, User, user_role, Order as OrderType } from "@/shared/types";
 import { Grid, Skeleton } from "@mantine/core";
-import { BuildingOffice, Handshake, ShoppingCartSimple } from "@phosphor-icons/react";
+import { BuildingOffice, Coins, Handshake, ShoppingCartSimple } from "@phosphor-icons/react";
 import { useQueries } from "@tanstack/react-query";
 
 const Home = () => {
@@ -21,7 +21,8 @@ const Home = () => {
           }).catch(err => {
             toast(err?.response?.data.message).error()
             return [] as Company[]
-          })
+          }),
+        refetchInterval: 60000,
       },
       {
         queryKey: ["registered-vendors", user?.id],
@@ -30,7 +31,8 @@ const Home = () => {
           .catch(err => {
             toast(err?.reponse?.data?.messsage).error()
             return [] as User[]
-          })
+          }),
+        refetchInterval: 60000,
       },
       {
         queryKey: ["all-orders", user?.id],
@@ -40,13 +42,18 @@ const Home = () => {
             toast(err?.response?.data?.message).error();
             return [] as OrderType[]
           }),
+        refetchInterval: 60000,
       }
     ]
   })
 
   const isLoading = queryResult.some(item => item.isLoading);
-
   const [{ data: companies }, { data: vendors }, { data: orders }] = queryResult;
+
+  const totalAmount = (orders && orders?.length > 0) ? orders?.filter(item => (item.userPaid && item.vendorDelivered && item.userReceived)).reduce((accumulator, currentItem) => {
+    return accumulator + currentItem.totalAmount;
+  }, 0) : 0;
+
   const cardData = [
     {
       totalNumber: companies?.length ?? 0,
@@ -63,12 +70,19 @@ const Home = () => {
       totalNumber: orders?.length ?? 0, title: "Orders",
       icon: ShoppingCartSimple, action: "view orders",
       actionPath: "/dashboard/orders"
-    }
+    },
+    {
+      title: "Total Transaction Amount",
+      action: "view orders",
+      totalNumber: `₦${convertAmount(totalAmount!)}`,
+      actionPath: "/dashboard/orders/successfull-deliveries",
+      icon: Coins
+    },
   ]
   return (
     <Grid>
       {isLoading ? <>
-        {Array(3).fill(null).map((item, key) => (
+        {Array(5).fill(null).map((item, key) => (
           <Grid.Col
             key={key}
             span={{ base: 12, xs: 12, md: 6, lg: 4 }}>
