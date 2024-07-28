@@ -51,7 +51,7 @@ export default class OrderController implements IControllerBase {
 
         this.router.post("/confirm-delivery/:orderId", this.confirmOrder)
 
-      
+
     }
 
 
@@ -137,16 +137,17 @@ export default class OrderController implements IControllerBase {
             })
 
             //mail users with pay link
+            const paymentUrl = `${process.env.FRONTEND_URL}/payment/${orderRef.slice(1)}`
             mailService({
                 subject: "Order placed for successfully",
-                email:customer.email,
-                template:"orderPlaced", 
-                orderRef, 
+                email: customer.email,
+                template: "orderPlaced",
+                orderRef,
                 name: customer!.name,
                 companyName: req.user?.company?.name,
-                url:`${process.env.FRONTEND_URL}/payment/${orderRef.slice(1)}`
+                url: paymentUrl
             })
-            return res.status(201).json({ result: orders })
+            return res.status(201).json({ result: { orders, paymentUrl } })
 
         } catch (error) {
             return res.status(500).json(errorMessage(error, true))
@@ -555,7 +556,7 @@ export default class OrderController implements IControllerBase {
     //     }
     // }
 
-    
-  
+
+
 
 }
