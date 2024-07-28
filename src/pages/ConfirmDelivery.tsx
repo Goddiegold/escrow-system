@@ -128,9 +128,10 @@ const ConfirmDelivery = () => {
         </Flex>
 
         {!loading1 && <Flex
-          // mx={"auto"}
+          mx={"auto"}
           maw={500} my={10} p={20}>
-          <Text fw={300} size="sm">Contact 24/7 support via support@escrowsystem.com or +234 705 215 2823 if you haven't received this order</Text>
+          <Text fw={300} size="sm">
+            Contact 24/7 support via support@escrowsystem.com or +234 705 215 2823 if you haven't received this order.</Text>
         </Flex>}
       </Flex>
     </Flex>
