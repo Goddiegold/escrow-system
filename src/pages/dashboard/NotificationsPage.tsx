@@ -132,7 +132,7 @@ const NotificationsPage = () => {
                     break;
 
                 case notification_type.delivery_confirmed:
-                    message = `${customer?.name || 'A customer'} just confirmed that order ${orderRef} ${!isVendor && `with ${item.vendor?.name}`} ${order?.userReceived ? "has been received successfully" : "hasn't been received"}. ${isVendor && order?.userReceived && ` You've been credited with ₦${convertAmount(order!.totalAmount as number)}`}`
+                    message = `${customer?.name || 'A customer'} just confirmed that order ${orderRef} ${!isVendor ? `with ${item.vendor?.name}`:""} ${order?.userReceived ? "has been received successfully" : "hasn't been received"}. ${isVendor && order?.userReceived && ` You've been credited with ₦${convertAmount(order!.totalAmount as number)}`}`
 
                     path = isVendor ? (order?.userReceived ? "/dashboard/wallet/" : "/dashboard/orders") :
                         `/dashboard/vendor-orders/${item!.vendor!.id}`;

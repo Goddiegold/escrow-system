@@ -135,6 +135,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                             <Menu.Divider />
                             <Menu.Label>Other</Menu.Label>
                             <Flex className="block md:hidden">
+                          {!isAdmin && <Menu.Item
+                                my={10}
+                                leftSection={<Bell stroke={`1.5`} size={20} />}
+                                onClick={() => navigate("/dashboard/notifications")}>Notifications</Menu.Item>}
                                 <Tooltip label={dark ? "Light mode" : "Dark mode"}>
                                     <Menu.Item
                                         onClick={() => toggleColorScheme()}

@@ -89,10 +89,10 @@ const ConfirmDelivery = () => {
                 </Flex>
 
                 <Flex className="flex flex-col sm:flex-row" my={10} justify={"space-between"}>
-                  <Button color="dark" fw={400} className="mb-[10px] sm:mb-0">No (I haven't received the order)</Button>
+                  {/* <Button color="dark" fw={400} className="mb-[10px] sm:mb-0">No (I haven't received the order)</Button> */}
                   <Popover width={200} position="bottom" withArrow shadow="md">
                     <Popover.Target>
-                      <Button color="red" fw={400}>Yes (I have received the order)</Button>
+                      <Button color="red" fw={400} mx={"auto"}>Yes (I have received the order)</Button>
                     </Popover.Target>
                     <Popover.Dropdown>
                       <Text size="sm">Are you sure you've received the delivery?</Text>
@@ -128,9 +128,9 @@ const ConfirmDelivery = () => {
         </Flex>
 
         {!loading1 && <Flex
-          mx={"auto"}
+          // mx={"auto"}
           maw={500} my={10} p={20}>
-          <Text fw={300} size="sm">24/7 support via support@escrowsystem.com or +234 705 215 2823</Text>
+          <Text fw={300} size="sm">Contact 24/7 support via support@escrowsystem.com or +234 705 215 2823 if you haven't received this order</Text>
         </Flex>}
       </Flex>
     </Flex>

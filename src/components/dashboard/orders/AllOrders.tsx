@@ -97,8 +97,8 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
                     color={item.userPaid ? "green" : "red"}>{item?.userPaid ? "Paid" : "Not Paid"}</Badge>
             </Table.Td>}
 
-            <Table.Td>
-                {(isNotVendor && item.userPaid && item.order_status !== order_status.cancelled) ?
+            {isNotVendor && <Table.Td>
+                {(item.userPaid && item.order_status !== order_status.cancelled) ?
                     <Flex >
                         <Select
                             value={orderStatus}
@@ -125,7 +125,7 @@ const TableRow: React.FC<TableRowProps> = ({ item }) => {
                         </>}
                     </Flex> : "--"
                 }
-            </Table.Td>
+            </Table.Td>}
             <Table.Td>
                 {(item.order_status === order_status.pending) ||
                     (item.order_status === order_status.delivered) ?
@@ -163,7 +163,7 @@ const AllOrders = () => {
                 toast(err?.response?.data?.message).error();
                 return [] as OrderType[]
             }),
-            refetchInterval:30000
+        refetchInterval: 30000
     })
 
     const { SearchInput, queryResult,
