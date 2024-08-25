@@ -49,7 +49,7 @@ class App {
         this.updateFromRepo()
         this.app.get("/", (req, res) => {
             return res.status(200).send({
-                message: "GUARDIAN - V1.0"
+                message: "ESCROW PAYMENET SYSTEM - V1.0"
             })
         })
         this.app.listen(this.port, () => {
