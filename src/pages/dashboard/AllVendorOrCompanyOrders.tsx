@@ -167,7 +167,7 @@ const AllVendorOrders = () => {
 
                                         <Table.Td>
                                             <Badge color={item.userReceived ? "green" : "orange"}>
-                                                {item.userReceived ? "" : "pending"}
+                                                {item.userReceived ? "success" : "pending"}
                                             </Badge>
                                         </Table.Td>
 

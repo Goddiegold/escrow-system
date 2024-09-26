@@ -93,7 +93,7 @@ export function NavbarSimpleColored() {
       type: Action_Type.LOGOUT_USER,
       payload: null
     })
-    navigate(user?.role === user_role.vendor ? `/${user?.company?.slug}/login` : "/login")
+    window.location.href = (user?.role === user_role.vendor ? `/${user?.company?.slug}/login` : "/login")
   }
   return (
     <>

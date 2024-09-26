@@ -36,7 +36,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                 type: Action_Type.LOGOUT_USER,
                 payload: null
             })
-            navigate(user?.role === user_role.vendor ? `/${user?.company?.slug}/login` : "/login")
+            window.location.href = (user?.role === user_role.vendor ? `/${user?.company?.slug}/login` : "/login")
         }
 
         const MenuOptions = () => {
@@ -135,10 +135,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                             <Menu.Divider />
                             <Menu.Label>Other</Menu.Label>
                             <Flex className="block md:hidden">
-                          {!isAdmin && <Menu.Item
-                                my={10}
-                                leftSection={<Bell stroke={`1.5`} size={20} />}
-                                onClick={() => navigate("/dashboard/notifications")}>Notifications</Menu.Item>}
+                                {!isAdmin && <Menu.Item
+                                    my={10}
+                                    leftSection={<Bell stroke={`1.5`} size={20} />}
+                                    onClick={() => navigate("/dashboard/notifications")}>Notifications</Menu.Item>}
                                 <Tooltip label={dark ? "Light mode" : "Dark mode"}>
                                     <Menu.Item
                                         onClick={() => toggleColorScheme()}
